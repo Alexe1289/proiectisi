@@ -10,7 +10,7 @@ class Client(db.Model):
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     phone = db.Column(db.String(50), nullable=True)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.LargeBinary, nullable=False)
 
 class Provider(db.Model):
     __tablename__ = "providers"
@@ -19,7 +19,7 @@ class Provider(db.Model):
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     phone = db.Column(db.String(50), nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.LargeBinary, nullable=False)
 
 class Location(db.Model):
     __tablename__ = "locations"
