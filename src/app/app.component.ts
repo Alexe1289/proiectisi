@@ -23,6 +23,9 @@ export class AppComponent {
   }, {
     name: 'Providers',
     link: '/providers'
+  }, {
+    name: 'Reservations',
+    link: '/reservations'
   }];
 
   activeTab = this.tabs[0].link;

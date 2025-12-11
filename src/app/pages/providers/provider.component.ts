@@ -14,6 +14,7 @@ import FeatureLayer from '@arcgis/core/layers/FeatureLayer.js';
 import Editor from '@arcgis/core/widgets/Editor.js';
 import IdentityManager from "@arcgis/core/identity/IdentityManager";
 import { element } from 'protractor';
+import FeatureFilter from '@arcgis/core/layers/support/FeatureFilter.js';
 
 @Component({
 	selector: 'provider',
@@ -31,6 +32,10 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 	private readonly featureLayerUrl =
 		'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente2/FeatureServer/0';
+	
+	private readonly parkingLayerUrl =
+		'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente/FeatureServer/0';
+
 
 
 	async ngAfterViewInit(): Promise<void> {
@@ -44,10 +49,23 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 				url: this.featureLayerUrl,
 				outFields: ['*'],
 			});
+			const parkingLayer = new FeatureLayer({
+				url: this.parkingLayerUrl,
+				outFields: ["*"],
+			});
+
+			parkingLayer.featureEffect = {
+				filter: new FeatureFilter({
+					where: "1 = 0"   // matches nothing → all hidden
+				}),
+				excludedEffect: "opacity(0%)"  // hide excluded features
+			} as any;
+
+			
 
 			const map = new Map({
 				basemap: 'arcgis-topographic',
-				layers: [locationsLayer],
+				layers: [parkingLayer, locationsLayer],
 			});
 
 			this.view = new MapView({
@@ -60,11 +78,12 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 			await this.view.when();
 			await locationsLayer.when();
+			this.view.goTo({
+				center: [26.1025, 44.4268], // Bucharest
+				zoom: 13
+			});
 
-			if (locationsLayer.fullExtent) {
-				this.view.goTo(locationsLayer.fullExtent).catch(() => {
-				});
-			}
+			
 
 			const editor = new Editor({
 				view: this.view,
@@ -90,6 +109,12 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 							]
 						} as any
 					},
+					{
+						layer: parkingLayer,
+						addEnabled: true,
+						updateEnabled: true,
+						deleteEnabled: true,
+					}
 				],
 			});
 
@@ -97,40 +122,48 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 			this.view.ui.add(editor, 'top-right');
 			locationsLayer.on("edits", async (event) => {
 				console.log("Layer edit event:", event);
-				const deleted = event.deletedFeatures?.[0] || null;
-				if (deleted) {
-					var oid = deleted.objectId;
-					// fetch user ID
-					// notify backend with DELETE objID and userID
-					return;
-				}
 				const feature =
 					event.addedFeatures?.[0] ||
 					event.updatedFeatures?.[0] ||
+					event.deletedFeatures?.[0] ||
 					null;
 
-				if (!feature) return;
+					if (!feature) return;
+					// notify backend about the change
+					const oid = feature.objectId;
 
-				oid = feature.objectId;
-				const result = await locationsLayer.queryFeatures({
-					where: `OBJECTID = ${oid}`,
-					outFields: ["*"],
-					returnGeometry: true
-				});
-				const fullFeature = result.features[0];
-				//to_change with user_id
-				const user_id = 666;
-				if (!fullFeature.attributes["user_id"]) {
-					fullFeature.attributes["user_id"] = user_id;
-
-					await locationsLayer.applyEdits({
-						updateFeatures: [fullFeature]
-					});
-
-					console.log("Username added to new feature:", oid);
-				}
-				console.log("OBJECTID:", oid);
 			});
+
+			let selectedLocationOID: number | null = null;
+
+			this.view.on("click", async (event) => {
+			const hit = await this.view!.hitTest(event);
+
+			const result = hit.results.find((r) =>
+				r.type === "graphic" && (r as any).graphic.layer === locationsLayer
+			);
+
+			if (!result) return;
+
+			const graphic = (result as any).graphic;
+			selectedLocationOID = graphic.attributes.OBJECTID;
+			console.log("Selected Location OID:", selectedLocationOID);
+
+			console.log("Clicked feature:", graphic);
+
+			this.view!.goTo({
+				target: graphic.geometry,
+				zoom: 17
+			});
+			parkingLayer.featureEffect = {
+				filter: new FeatureFilter({
+					where: `location_id = ${selectedLocationOID}`
+				}),
+				includedEffect: "opacity(100%)",
+				excludedEffect: "opacity(0%)"  // hide excluded features
+			} as any;
+			});
+			
 
 
 		} catch (err) {

@@ -17,6 +17,7 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from "src/environments/environment";
 import { ProviderComponent } from "./pages/providers/provider.component";
+import { ReservationDashboardComponent } from "./pages/reservation-dashboard/reservation-dashboard.component";
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ProviderComponent } from "./pages/providers/provider.component";
     HomeComponent,
     MapComponent,
     ProviderComponent,
+    ReservationDashboardComponent,
   ],
   imports: [
     BrowserModule,

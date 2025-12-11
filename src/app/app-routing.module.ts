@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { MapComponent } from './pages/map/map.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ProviderComponent} from './pages/providers/provider.component';
+import { ReservationDashboardComponent } from './pages/reservation-dashboard/reservation-dashboard.component';
 
 
 export const routes: Routes = [
@@ -17,6 +18,10 @@ export const routes: Routes = [
   {
     path: 'providers',
     component: ProviderComponent,
+  },
+  {
+    path: 'reservations',
+    component: ReservationDashboardComponent,
   },
   {
     path: '',

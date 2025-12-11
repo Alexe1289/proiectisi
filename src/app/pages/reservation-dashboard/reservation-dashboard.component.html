@@ -1,0 +1,54 @@
+<div class="dashboard-container">
+
+  <!-- LEFT SIDE — MAP -->
+  <div class="map-section">
+    <div #mapViewNode class="map-view"></div>
+  </div>
+
+  <!-- RIGHT SIDE — RESERVATION PANEL -->
+  <div class="panel-section">
+
+    <h2 class="panel-title">Reservation Overview</h2>
+
+    <!-- CALENDAR SECTION -->
+    <div class="calendar-wrapper">
+      <h3>Your Reservations</h3>
+
+      <div class="calendar-grid">
+        <div 
+          *ngFor="let day of calendarDays" 
+          class="calendar-day"
+          [ngClass]="{
+            'has-reservation': day.reservation,
+            'has-request': day.request
+          }"
+        >
+          <div class="day-number">{{ day.day }}</div>
+
+          <!-- Approved Reservation -->
+          <div *ngIf="day.reservation" class="reservation-tag">
+            Reserved
+          </div>
+
+          <!-- Pending Request -->
+          <div *ngIf="day.request" class="request-tag">
+            Request
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPCOMING LIST -->
+    <div class="list-section">
+      <h3>Upcoming Bookings</h3>
+
+      <div *ngFor="let r of upcomingReservations" class="reservation-card">
+        <p class="res-title">{{ r.locationName }}</p>
+        <p class="res-date">{{ r.date }}</p>
+        <p class="res-status" [ngClass]="r.status">{{ r.status | uppercase }}</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
