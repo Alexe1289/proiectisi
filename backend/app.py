@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import bcrypt
 from models import *
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)  # allow Angular → Flask calls
@@ -59,26 +60,32 @@ def register():
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    data = request.json
+    data = request.json or {}
+
     email = data.get("email")
     password = data.get("password")
+    role = data.get("role")
 
-    user = Client.query.filter_by(email=email).first()
-    role = "client"
+    if not email or not password or not role:
+        return jsonify({"msg": "Email, password and role are required"}), 400
 
-    # check if user is a client
-    if not user:
+    if role == "client":
+        user = Client.query.filter_by(email=email).first()
+        user_id = lambda u: u.client_id
+    elif role == "provider":
         user = Provider.query.filter_by(email=email).first()
-        role = "provider"
-    
+        user_id = lambda u: u.provider_id
+    else:
+        return jsonify({"msg": "Role must be 'client' or 'provider'"}), 400
+
     if not user:
         return jsonify({"msg": "There isn't an account with these credentials"}), 401
 
     if not bcrypt.checkpw(password.encode("utf-8"), user.password_hash):
         return jsonify({"msg": "Password is incorrect"}), 401
-    
+
     access_token = create_access_token(
-        identity=f"{user.client_id if role=='client' else user.provider_id}:{role}",
+        identity=f"{user_id(user)}:{role}",
         expires_delta=False
     )
 
@@ -118,6 +125,61 @@ def add_location():
 
     return jsonify({"msg": "Location added", "location_id": loc.location_id})
 
+@app.route("/api/provider/locations/<int:loc_id>", methods=["PUT"])
+@jwt_required()
+def update_location(loc_id):
+    user_id, role = get_user()
+
+    if role != "provider":
+        return jsonify({"msg": "Only providers can update locations!"}), 403
+
+    loc = Location.query.get(loc_id)
+
+    if not loc:
+        return jsonify({"msg": "Location not found!"}), 404
+
+    if loc.provider_id != user_id:
+        return jsonify({"msg": "You can update only your own locations!"}), 403
+
+    data = request.json or {}
+
+    # all columns
+    columns = Location.__table__.columns.keys()
+
+    # columns not allowed to be modified
+    forbidden_fields = {"location_id", "provider_id"}
+
+    for field in columns:
+        if field in forbidden_fields:
+            continue
+        if field in data:
+            setattr(loc, field, data[field])
+
+    db.session.commit()
+
+    return jsonify({"msg": "Location updated", "location_id": loc.location_id})
+
+@app.route("/api/provider/locations/<int:loc_id>", methods=["DELETE"])
+@jwt_required()
+def delete_location(loc_id):
+    user_id, role = get_user()
+
+    if role != "provider":
+        return jsonify({"msg": "Only providers can delete locations!"}), 403
+
+    loc = Location.query.get(loc_id)
+
+    if not loc:
+        return jsonify({"msg": "Location not found!"}), 404
+
+    if loc.provider_id != user_id:
+        return jsonify({"msg": "You can delete only your own locations!"}), 403
+
+    db.session.delete(loc)
+    db.session.commit()
+
+    return jsonify({"msg": "Location deleted successfully"})
+
 @app.route("/api/client/locations", methods=["GET"])
 @jwt_required()
 def get_locations_for_clients():
@@ -131,6 +193,7 @@ def get_locations_for_clients():
     result = [
         {
             "location_id": loc.location_id,
+            "arcgis_feature_id": loc.arcgis_feature_id,
             "name": loc.name
         }
         for loc in locs
@@ -140,7 +203,7 @@ def get_locations_for_clients():
 
 @app.route("/api/client/locations/<int:loc_id>", methods=["GET"])
 @jwt_required()
-def get_location_details(loc_id):
+def get_location_details(loc_id):   
     user_id, role = get_user()
 
     if role != "client":
@@ -159,8 +222,158 @@ def get_location_details(loc_id):
         "arcgis_feature_id": loc.arcgis_feature_id,
         "address": loc.address,
         "location_type": loc.location_type,
-        "provider_id": loc.provider_id
+        "provider": {
+            "name": loc.provider.name,
+            "email": loc.provider.email
+        }
     }
+
+    return jsonify(result)
+
+@app.route("/api/provider/locations", methods=["GET"])
+@jwt_required()
+def get_provider_locations():
+    user_id, role = get_user()
+
+    if role != "provider":
+        return jsonify({"msg": "Only providers can access their locations!"}), 403
+
+    locs = Location.query.filter_by(provider_id=user_id).all()
+
+    result = [
+        {
+            "location_id": loc.location_id,
+            "arcgis_feature_id": loc.arcgis_feature_id,
+            "name": loc.name
+        }
+        for loc in locs
+    ]
+
+    return jsonify(result)
+
+@app.route("/api/client/locations/<int:loc_id>/reservations", methods=["POST"])
+@jwt_required()
+def add_reservation(loc_id):
+    user_id, role = get_user()
+
+    if role != "client":
+        return jsonify({"msg": "Only clients can make reservations!"}), 403
+
+    loc = Location.query.get(loc_id)
+    if not loc:
+        return jsonify({"msg": "Location not found!"}), 404
+
+    data = request.json
+    start_datetime = data.get("start_datetime")
+    end_datetime = data.get("end_datetime")
+
+    if not start_datetime or not end_datetime:
+        return jsonify({"msg": "Missing date interval!"}), 400
+
+    reservation = Reservation(
+        client_id=user_id,
+        location_id=loc_id,
+        start_datetime=datetime.fromisoformat(start_datetime),
+        end_datetime=datetime.fromisoformat(end_datetime),
+        created_at=datetime.utcnow()
+    )
+
+    db.session.add(reservation)
+    db.session.commit()
+
+    return jsonify({"msg": "Reservation created", "reservation_id": reservation.reservation_id})
+
+@app.route("/api/reservations", methods=["GET"])
+@jwt_required()
+def get_reservations():
+    user_id, role = get_user()
+
+    if role == "client":
+        reservations = Reservation.query.filter_by(client_id=user_id).all()
+
+        result = [
+            {
+                "reservation_id": r.reservation_id,
+                "location": {
+                    "location_id": r.location.location_id,
+                    "name": r.location.name
+                },
+                "provider": {
+                    "provider_id": r.location.provider.provider_id,
+                    "name": r.location.provider.name,
+                    "email": r.location.provider.email
+                },
+                "start_datetime": r.start_datetime.isoformat(),
+                "end_datetime": r.end_datetime.isoformat(),
+                "created_at": r.created_at.isoformat()
+            }
+            for r in reservations
+        ]
+
+        return jsonify(result)
+
+    elif role == "provider":
+        reservations = (
+            Reservation.query
+            .join(Location)
+            .filter(Location.provider_id == user_id)
+            .all()
+        )
+
+        result = [
+            {
+                "reservation_id": r.reservation_id,
+                "location": {
+                    "location_id": r.location.location_id,
+                    "name": r.location.name
+                },
+                "client": {
+                    "client_id": r.client.client_id,
+                    "name": r.client.name,
+                    "email": r.client.email
+                },
+                "start_datetime": r.start_datetime.isoformat(),
+                "end_datetime": r.end_datetime.isoformat(),
+                "created_at": r.created_at.isoformat()
+            }
+            for r in reservations
+        ]
+
+        return jsonify(result)
+
+    return jsonify({"msg": "Invalid role"}), 403
+
+@app.route("/api/provider/locations/<int:loc_id>/reservations", methods=["GET"])
+@jwt_required()
+def get_reservations_for_location(loc_id):
+    user_id, role = get_user()
+
+    if role != "provider":
+        return jsonify({"msg": "Only providers can access this!"}), 403
+
+    loc = Location.query.get(loc_id)
+    if not loc:
+        return jsonify({"msg": "Location not found!"}), 404
+
+    if loc.provider_id != user_id:
+        return jsonify({"msg": "You can access only your own locations!"}), 403
+
+    reservations = Reservation.query.filter_by(location_id=loc_id).all()
+
+    result = [
+        {
+            "reservation_id": r.reservation_id,
+            "client": {
+                "client_id": r.client.client_id,
+                "name": r.client.name,
+                "email": r.client.email
+            },
+            "start_datetime": r.start_datetime.isoformat(),
+            "end_datetime": r.end_datetime.isoformat(),
+            "created_at": r.created_at.isoformat()
+        }
+        for r in reservations
+    ]
 
     return jsonify(result)
 
