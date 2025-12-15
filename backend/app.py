@@ -6,7 +6,13 @@ from models import *
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)  # allow Angular → Flask calls
+CORS(
+    app,
+    resources={r"/api/*": {"origins": "http://localhost:4200"}},
+    supports_credentials=True,
+    allow_headers=["Authorization", "Content-Type"],
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+)  # allow Angular → Flask calls
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = "verysecretkey1234"

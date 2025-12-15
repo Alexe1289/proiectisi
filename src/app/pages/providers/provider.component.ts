@@ -33,27 +33,52 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 	private readonly featureLayerUrl =
 		'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente2/FeatureServer/0';
-	
+
 	private readonly parkingLayerUrl =
 		'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente/FeatureServer/0';
+	private readonly token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NTc4NjI5MSwianRpIjoiMmQ5MGFjNzQtOTBkOS00NzIyLWE1ZjMtZDkyM2YzMGZjZDJjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjM6cHJvdmlkZXIiLCJuYmYiOjE3NjU3ODYyOTEsImNzcmYiOiIwNTdhODE1OC05Y2EwLTRjZjctOGZmZi01MGExMzMwN2Y3NDUifQ.7vBtFbhlv3dPE6ZA3Ze2GNRKBwZybZpSg8xI44bTUms";
+	private allowedLocationIds: number[] = [];
+	private isUpdatingParking = false;
 
-	constructor(private http: HttpClient) {}
+	constructor(private http: HttpClient) { }
 
 	async fetchAllowedLocationIds(): Promise<number[]> {
-		const token = "HARDCODED_JWT_FOR_NOW";
 
 		const headers = new HttpHeaders({
-			Authorization: `Bearer ${token}`
+			Authorization: `Bearer ${this.token}`
 		});
 
 		const response = await this.http.get<
-		{ location_id: number }[]
+			{ arcgis_feature_id: number }[]
 		>(
-			"http://localhost:5000/api/provider/getlocations",
+			"http://localhost:5001/api/provider/locations",
 			{ headers }
 		).toPromise();
 
-		return response?.map(r => r.location_id) ?? [];
+		console.log("Fetched allowed location IDs from backend:", response);
+		return response?.map(r => r.arcgis_feature_id) ?? [];
+	}
+	async sendLocationToBackend(payload: {
+		name: string;
+		capacity: number;
+		description?: string | null;
+		address: string;
+		location_type: string;
+		arcgis_feature_id: number;
+	}) {
+
+		const headers = new HttpHeaders({
+			Authorization: `Bearer ${this.token}`,
+			"Content-Type": "application/json"
+		});
+
+		await this.http.post(
+			"http://localhost:5001/api/provider/locations",
+			payload,
+			{ headers }
+		).toPromise();
+
+		console.log("Location sent to backend:", payload);
 	}
 
 	async ngAfterViewInit(): Promise<void> {
@@ -79,7 +104,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 				excludedEffect: "opacity(0%)"  // hide excluded features
 			} as any;
 
-			
+
 
 			const map = new Map({
 				basemap: 'arcgis-topographic',
@@ -101,18 +126,18 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 				zoom: 13
 			});
 
-			const allowedLocationIds = await this.fetchAllowedLocationIds();
+			this.allowedLocationIds = await this.fetchAllowedLocationIds();
 
-			if (allowedLocationIds.length === 0) {
-			locationsLayer.definitionExpression = "1 = 0"; // hide all
+			if (this.allowedLocationIds.length === 0) {
+				locationsLayer.definitionExpression = "1 = 0"; // hide all
 			} else {
-			locationsLayer.definitionExpression =
-				`OBJECTID IN (${allowedLocationIds.join(",")})`;
+				locationsLayer.definitionExpression =
+					`OBJECTID IN (${this.allowedLocationIds.join(",")})`;
 			}
-			console.log("Allowed location IDs from backend:", allowedLocationIds);
+			console.log("Allowed location IDs from backend:", this.allowedLocationIds);
 
 
-			
+
 
 			const editor = new Editor({
 				view: this.view,
@@ -124,17 +149,17 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						deleteEnabled: true,
 						formTemplate: {
 							elements: [
-							{
-								type: "group",
-								label: "Location Info",
-								elements: [
-								{ type: "field", fieldName: "name" },
-								{ type: "field", fieldName: "address" },
-								{ type: "field", fieldName: "parking" },
-								{ type: "field", fieldName: "capacity" },
-								{ type: "field", fieldName: "location_type" }
-								]
-							}
+								{
+									type: "group",
+									label: "Location Info",
+									elements: [
+										{ type: "field", fieldName: "name" },
+										{ type: "field", fieldName: "address" },
+										{ type: "field", fieldName: "parking" },
+										{ type: "field", fieldName: "capacity" },
+										{ type: "field", fieldName: "location_type" }
+									]
+								}
 							]
 						} as any
 					},
@@ -143,6 +168,18 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						addEnabled: true,
 						updateEnabled: true,
 						deleteEnabled: true,
+						formTemplate: {
+							elements: [
+								{
+									type: "group",
+									label: "Logistic Info",
+									elements: [
+										{ type: "field", fieldName: "capacity" },
+										{ type: "field", fieldName: "parking" }
+									]
+								}
+							]
+						} as any
 					}
 				],
 			});
@@ -150,49 +187,88 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 			this.view.ui.add(editor, 'top-right');
 			locationsLayer.on("edits", async (event) => {
-				console.log("Layer edit event:", event);
-				const feature =
-					event.addedFeatures?.[0] ||
-					event.updatedFeatures?.[0] ||
-					event.deletedFeatures?.[0] ||
-					null;
 
-					if (!feature) return;
-					// notify backend about the change
-					const oid = feature.objectId;
+				if (!event.addedFeatures || event.addedFeatures.length === 0) return;
 
+				const added = event.addedFeatures[0];
+
+				const objectId = added.objectId;
+				console.log("New ArcGIS feature created:", objectId);
+
+				const result = await locationsLayer.queryFeatures({
+					objectIds: [objectId],
+					outFields: ["*"],
+					returnGeometry: false
+				});
+
+				const feature = result.features[0];
+				const attrs = feature.attributes;
+
+				this.allowedLocationIds.push(objectId);
+				locationsLayer.definitionExpression = `OBJECTID IN (${this.allowedLocationIds.join(",")})`;
+
+				await this.sendLocationToBackend({
+					name: attrs.name,
+					capacity: attrs.capacity,
+					description: attrs.description ?? null,
+					address: attrs.address,
+					location_type: attrs.location_type,
+					arcgis_feature_id: objectId
+				});
 			});
 
 			let selectedLocationOID: number | null = null;
 
 			this.view.on("click", async (event) => {
-			const hit = await this.view!.hitTest(event);
+				const hit = await this.view!.hitTest(event);
 
-			const result = hit.results.find((r) =>
-				r.type === "graphic" && (r as any).graphic.layer === locationsLayer
-			);
+				const result = hit.results.find((r) =>
+					r.type === "graphic" && (r as any).graphic.layer === locationsLayer
+				);
 
-			if (!result) return;
+				if (!result) return;
 
-			const graphic = (result as any).graphic;
-			selectedLocationOID = graphic.attributes.OBJECTID;
-			console.log("Selected Location OID:", selectedLocationOID);
+				const graphic = (result as any).graphic;
+				selectedLocationOID = graphic.attributes.OBJECTID;
+				console.log("Selected Location OID:", selectedLocationOID);
 
-			console.log("Clicked feature:", graphic);
+				console.log("Clicked feature:", graphic);
 
-			this.view!.goTo({
-				target: graphic.geometry,
-				zoom: 17
+				this.view!.goTo({
+					target: graphic.geometry,
+					zoom: 17
+				});
+				parkingLayer.featureEffect = {
+					filter: new FeatureFilter({
+						where: `location_id = ${selectedLocationOID}`
+					}),
+					includedEffect: "opacity(100%)",
+					excludedEffect: "opacity(0%)"  // hide excluded features
+				} as any;
 			});
-			parkingLayer.featureEffect = {
-				filter: new FeatureFilter({
-					where: `location_id = ${selectedLocationOID}`
-				}),
-				includedEffect: "opacity(100%)",
-				excludedEffect: "opacity(0%)"  // hide excluded features
-			} as any;
+
+			parkingLayer.on("edits", async (event) => {
+				if (this.isUpdatingParking) return;
+
+				if (!event.addedFeatures || event.addedFeatures.length === 0) return;
+				const added = event.addedFeatures[0];
+				const objectId = added.objectId;
+				console.log("New parking feature added:", added);
+				const result = await parkingLayer.queryFeatures({
+					objectIds: [objectId],
+					outFields: ["*"],
+					returnGeometry: true
+				});
+				const feature = result.features[0];
+				feature.attributes.location_id = selectedLocationOID;
+				this.isUpdatingParking = true;
+				console.log("Updating parking feature with location_id:", feature.attributes.location_id);
+				await parkingLayer.applyEdits({
+					updateFeatures: [feature]
+				});
+				this.isUpdatingParking = false;
+
 			});
-			
 
 
 		} catch (err) {

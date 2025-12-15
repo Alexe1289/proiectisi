@@ -18,6 +18,7 @@ import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from "src/environments/environment";
 import { ProviderComponent } from "./pages/providers/provider.component";
 import { ReservationDashboardComponent } from "./pages/reservation-dashboard/reservation-dashboard.component";
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { ReservationDashboardComponent } from "./pages/reservation-dashboard/res
     MatListModule,
     FlexLayoutModule,
     AngularFireModule.initializeApp(environment.firebase, 'AngularDemoFirebase'),
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
