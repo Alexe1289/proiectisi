@@ -15,6 +15,7 @@ import Editor from '@arcgis/core/widgets/Editor.js';
 import IdentityManager from "@arcgis/core/identity/IdentityManager";
 import { element } from 'protractor';
 import FeatureFilter from '@arcgis/core/layers/support/FeatureFilter.js';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
 	selector: 'provider',
@@ -36,7 +37,24 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 	private readonly parkingLayerUrl =
 		'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente/FeatureServer/0';
 
+	constructor(private http: HttpClient) {}
 
+	async fetchAllowedLocationIds(): Promise<number[]> {
+		const token = "HARDCODED_JWT_FOR_NOW";
+
+		const headers = new HttpHeaders({
+			Authorization: `Bearer ${token}`
+		});
+
+		const response = await this.http.get<
+		{ location_id: number }[]
+		>(
+			"http://localhost:5000/api/provider/getlocations",
+			{ headers }
+		).toPromise();
+
+		return response?.map(r => r.location_id) ?? [];
+	}
 
 	async ngAfterViewInit(): Promise<void> {
 		try {
@@ -82,6 +100,17 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 				center: [26.1025, 44.4268], // Bucharest
 				zoom: 13
 			});
+
+			const allowedLocationIds = await this.fetchAllowedLocationIds();
+
+			if (allowedLocationIds.length === 0) {
+			locationsLayer.definitionExpression = "1 = 0"; // hide all
+			} else {
+			locationsLayer.definitionExpression =
+				`OBJECTID IN (${allowedLocationIds.join(",")})`;
+			}
+			console.log("Allowed location IDs from backend:", allowedLocationIds);
+
 
 			
 
