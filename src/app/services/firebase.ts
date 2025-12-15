@@ -72,7 +72,7 @@ export class FirebaseService {
             .list('/points')
             .snapshotChanges()
             .pipe(
-                map(changes =>
+                map((changes: any[]) =>
                     changes.map(c => {
                         const data: any = c.payload.val();
                         const key = c.key;

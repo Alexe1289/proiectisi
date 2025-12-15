@@ -60,32 +60,26 @@ def register():
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    data = request.json or {}
-
+    data = request.json
     email = data.get("email")
     password = data.get("password")
-    role = data.get("role")
 
-    if not email or not password or not role:
-        return jsonify({"msg": "Email, password and role are required"}), 400
+    user = Client.query.filter_by(email=email).first()
+    role = "client"
 
-    if role == "client":
-        user = Client.query.filter_by(email=email).first()
-        user_id = lambda u: u.client_id
-    elif role == "provider":
+    # check if user is a client
+    if not user:
         user = Provider.query.filter_by(email=email).first()
-        user_id = lambda u: u.provider_id
-    else:
-        return jsonify({"msg": "Role must be 'client' or 'provider'"}), 400
-
+        role = "provider"
+    
     if not user:
         return jsonify({"msg": "There isn't an account with these credentials"}), 401
 
     if not bcrypt.checkpw(password.encode("utf-8"), user.password_hash):
         return jsonify({"msg": "Password is incorrect"}), 401
-
+    
     access_token = create_access_token(
-        identity=f"{user_id(user)}:{role}",
+        identity=f"{user.client_id if role=='client' else user.provider_id}:{role}",
         expires_delta=False
     )
 

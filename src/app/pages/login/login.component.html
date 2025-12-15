@@ -1,0 +1,19 @@
+<div class="login">
+  <h2>Login</h2>
+
+  <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+
+    <label>Email</label>
+    <input type="email" name="email" [(ngModel)]="email" required>
+
+    <label>Password</label>
+    <input type="password" name="password" [(ngModel)]="password" required>
+
+    <button type="submit">Login</button>
+  </form>
+
+  <p *ngIf="message" [ngClass]="{'success': success, 'error': !success}">
+    {{ message }}
+  </p>
+  <p *ngIf="currentRole">Rol curent (debug): {{ currentRole }}</p>
+</div>

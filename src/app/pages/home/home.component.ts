@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
-import { FirebaseService } from "src/app/services/firebase";
+import { Router } from "@angular/router";
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
     selector: 'app-home',
@@ -7,32 +8,31 @@ import { FirebaseService } from "src/app/services/firebase";
     styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
+    public currentRole: string = 'guest';
 
-    listItems: any[] = [];
-
-    constructor(private fbs: FirebaseService) {
+    constructor(private router: Router, public authService: AuthService) {
     }
 
-    connectDb() {
-        this.fbs.connectToDatabase();
-        // also ensure points feed is connected
-        this.fbs.connectToPoints();
-        // subscribe to simple list for demo printing to console
-        const list$ = this.fbs.getChangeFeedList();
-        if (list$) {
-            list$.subscribe((items: any[]) => {
-                console.log('List items updated', items);
-                this.listItems = items || [];
-            });
-        }
+    ngOnInit() {
+        this.authService.role$.subscribe(role => {
+        this.currentRole = role;
+        });
     }
 
-    addListEntry() {
-        const val = 'entry-' + new Date().toISOString();
-        this.fbs.addListObject(val);
+    navigateToMap() {
+        this.router.navigate(['/map']);
     }
 
-    clearAllPoints() {
-        this.fbs.clearPoints();
+    navigateToLogin() {
+        this.router.navigate(['/login']);
+    }
+
+    navigateToRegister() {
+        this.router.navigate(['/register']);
+    }
+
+    logout() {
+        this.authService.setRole('guest');
+        this.router.navigate(['/home']);
     }
 }

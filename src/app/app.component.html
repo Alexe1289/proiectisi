@@ -1,7 +1,18 @@
+<div style="padding: 8px; background-color: #eee; margin-bottom: 10px;">
+  <strong>Current role:</strong> {{ role }}
+</div>
+
 <nav mat-tab-nav-bar [tabPanel]="tabPanel">
-  <a mat-tab-link *ngFor="let tab of tabs" (click)="activeTab = tab.link" [active]="activeTab == tab.link"
-    [routerLink]="tab.link">{{tab.name}}</a>
+  <ng-container *ngFor="let tab of visibleTabs">
+    <a mat-tab-link
+       [routerLink]="tab.link"
+       [active]="activeTab === tab.link"
+       (click)="activeTab = tab.link">
+      {{ tab.name }}
+    </a>
+  </ng-container>
 </nav>
+
 <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 
 <div class="container">

@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Event, Router } from '@angular/router';
+import { ROLES, Role } from './auth/roles';
+import { AuthService } from './auth/auth.service';
 
 interface ITab {
   name: string;
   link: string;
+  roles?: string[];
 }
 
 @Component({
@@ -16,21 +19,37 @@ export class AppComponent {
 
   tabs: ITab[] = [{
     name: 'Home',
-    link: '/home'
+    link: '/home',
+    roles: [ROLES.GUEST, ROLES.CLIENT, ROLES.PROVIDER]
   }, {
     name: 'Map',
-    link: '/map'
+    link: '/map',
+    roles: [ROLES.CLIENT, ROLES.PROVIDER]
   }, {
-    name: 'Providers',
-    link: '/providers'
+    name: 'Register',
+    link: '/register',
+    roles: [ROLES.GUEST]
   }, {
-    name: 'Reservations',
-    link: '/reservations'
+    name: 'Login',
+    link: '/login',
+    roles: [ROLES.GUEST]
+  }, {
+    name: 'Provider',
+    link: '/provider',
+    roles: [ROLES.PROVIDER]
   }];
 
   activeTab = this.tabs[0].link;
 
-  constructor(private router: Router) {
+  role: string = 'guest';
+  currentRole: string = 'guest';
+
+  constructor(private router: Router, private authService: AuthService) {
+    this.authService.role$.subscribe(role => {
+      this.role = role;
+      this.currentRole = role;
+    });
+    
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
         this.activeTab = event.url;
@@ -43,5 +62,14 @@ export class AppComponent {
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
   }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('auth_token');
+  }
+
+  get visibleTabs(): ITab[] {
+    return this.tabs.filter(tab => tab.roles.includes(this.role));
+  }
+
 }
 

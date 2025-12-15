@@ -17,7 +17,13 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from "src/environments/environment";
 import { ProviderComponent } from "./pages/providers/provider.component";
-import { ReservationDashboardComponent } from "./pages/reservation-dashboard/reservation-dashboard.component";
+import { RegisterComponent } from './pages/register/register.component';
+
+import { FormsModule } from '@angular/forms';
+import { MaterialModule } from "./material.module";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { LoginComponent } from "./pages/login/login.component";
 
 @NgModule({
   declarations: [
@@ -25,18 +31,23 @@ import { ReservationDashboardComponent } from "./pages/reservation-dashboard/res
     HomeComponent,
     MapComponent,
     ProviderComponent,
-    ReservationDashboardComponent,
+    RegisterComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    MaterialModule,
     MatTabsModule,
     MatButtonModule,
     MatDividerModule,
     MatListModule,
     FlexLayoutModule,
     AngularFireModule.initializeApp(environment.firebase, 'AngularDemoFirebase'),
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
