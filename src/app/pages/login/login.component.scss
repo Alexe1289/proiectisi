@@ -1,4 +1,3 @@
-/* Centrare pagina */
 .login-container {
   display: flex;
   flex-direction: column;
@@ -7,7 +6,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* Form frumos */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -15,35 +13,30 @@
   width: 300px;
 }
 
-/* Rând label + input */
 .form-group {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* Label cu lățime fixă */
 .form-group label {
   width: 80px;
   text-align: right;
   margin-right: 10px;
 }
 
-/* Input full restul spațiului */
 .form-group input {
   flex: 1;
   padding: 6px;
   font-size: 14px;
 }
 
-/* Buton centrat și lat */
 .login-form button {
   padding: 10px;
   font-size: 16px;
   cursor: pointer;
 }
 
-/* Mesaje succes/eroare */
 .success {
   color: green;
 }
