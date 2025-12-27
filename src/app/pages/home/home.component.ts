@@ -31,6 +31,14 @@ export class HomeComponent {
         this.router.navigate(['/register']);
     }
 
+    navigateToProvider() {
+        this.router.navigate(['/provider']);
+    }
+
+    navigateToReservation() {
+        this.router.navigate(['/reservation']);
+    }
+
     logout() {
         this.authService.setRole('guest');
         this.router.navigate(['/home']);

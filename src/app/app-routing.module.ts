@@ -5,6 +5,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { ProviderComponent} from './pages/providers/provider.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { LoginComponent } from './pages/login/login.component';
+import { ReservationComponent } from './pages/reservation/reservation.component';
 import { AuthGuard } from './auth/auth.guard';
 import { ROLES } from './auth/roles';
 
@@ -37,6 +38,12 @@ export const routes: Routes = [
     component: ProviderComponent,
     canActivate: [AuthGuard],
     data: { roles: [ROLES.PROVIDER] }
+  },
+  {
+    path: 'reservation',
+    component: ReservationComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [ROLES.CLIENT] }
   },
   {
     path: '',

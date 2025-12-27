@@ -115,5 +115,5 @@ export class FirebaseService {
 
     getUserPosition() {
         return this.db.object('/userPosition').valueChanges();
-    }
+    }
 }
