@@ -1,13 +1,16 @@
-<div class="login">
+<div class="login-container">
   <h2>Login</h2>
 
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+  <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input id="email" type="email" name="email" [(ngModel)]="email" required>
+    </div>
 
-    <label>Email</label>
-    <input type="email" name="email" [(ngModel)]="email" required>
-
-    <label>Password</label>
-    <input type="password" name="password" [(ngModel)]="password" required>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input id="password" type="password" name="password" [(ngModel)]="password" required>
+    </div>
 
     <button type="submit">Login</button>
   </form>
@@ -15,5 +18,4 @@
   <p *ngIf="message" [ngClass]="{'success': success, 'error': !success}">
     {{ message }}
   </p>
-  <p *ngIf="currentRole">Rol curent (debug): {{ currentRole }}</p>
 </div>

@@ -37,6 +37,10 @@ export class AppComponent {
     name: 'Provider',
     link: '/provider',
     roles: [ROLES.PROVIDER]
+  }, {
+    name: 'Reservation',
+    link: '/reservation',
+    roles: [ROLES.CLIENT]
   }];
 
   activeTab = this.tabs[0].link;

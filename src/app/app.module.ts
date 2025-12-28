@@ -24,7 +24,7 @@ import { MaterialModule } from "./material.module";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from "./pages/login/login.component";
-import { ReservationDashboardComponent } from "./pages/reservation-dashboard/reservation-dashboard.component";
+import { ReservationComponent } from "./pages/reservation/reservation.component";
 
 @NgModule({
   declarations: [
@@ -34,6 +34,7 @@ import { ReservationDashboardComponent } from "./pages/reservation-dashboard/res
     ProviderComponent,
     RegisterComponent,
     LoginComponent,
+    ReservationComponent,
   ],
   imports: [
     BrowserModule,
