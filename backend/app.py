@@ -194,7 +194,10 @@ def get_locations_for_clients():
         {
             "location_id": loc.location_id,
             "arcgis_feature_id": loc.arcgis_feature_id,
-            "name": loc.name
+            "name": loc.name,
+            "address": loc.address,
+            "location_type": loc.location_type,
+            "capacity": loc.capacity
         }
         for loc in locs
     ]

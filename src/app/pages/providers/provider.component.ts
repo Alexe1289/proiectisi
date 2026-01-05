@@ -36,9 +36,11 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 	private readonly parkingLayerUrl =
 		'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente/FeatureServer/0';
-	private readonly token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NTc4NjI5MSwianRpIjoiMmQ5MGFjNzQtOTBkOS00NzIyLWE1ZjMtZDkyM2YzMGZjZDJjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjM6cHJvdmlkZXIiLCJuYmYiOjE3NjU3ODYyOTEsImNzcmYiOiIwNTdhODE1OC05Y2EwLTRjZjctOGZmZi01MGExMzMwN2Y3NDUifQ.7vBtFbhlv3dPE6ZA3Ze2GNRKBwZybZpSg8xI44bTUms";
+	// private readonly token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NTc4NjI5MSwianRpIjoiMmQ5MGFjNzQtOTBkOS00NzIyLWE1ZjMtZDkyM2YzMGZjZDJjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjM6cHJvdmlkZXIiLCJuYmYiOjE3NjU3ODYyOTEsImNzcmYiOiIwNTdhODE1OC05Y2EwLTRjZjctOGZmZi01MGExMzMwN2Y3NDUifQ.7vBtFbhlv3dPE6ZA3Ze2GNRKBwZybZpSg8xI44bTUms";
 	private allowedLocationIds: number[] = [];
 	private isUpdatingParking = false;
+	private token = localStorage.getItem('auth_token');
+
 
 	constructor(private http: HttpClient) { }
 
@@ -66,7 +68,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 		location_type: string;
 		arcgis_feature_id: number;
 	}) {
-
 		const headers = new HttpHeaders({
 			Authorization: `Bearer ${this.token}`,
 			"Content-Type": "application/json"

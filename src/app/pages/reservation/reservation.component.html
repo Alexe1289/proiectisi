@@ -1,54 +1,116 @@
-<div class="dashboard-container">
-
-  <!-- LEFT SIDE — MAP -->
-  <div class="map-section">
-    <div #mapViewNode class="map-view"></div>
+<div class="reservation-page">
+  <div class="header-section">
+    <h2>Book your next event</h2>
+    <button mat-stroked-button color="accent" (click)="toggleMap()" *ngIf="!showMap && searchResults.length > 0">
+      <mat-icon>map</mat-icon> Show on Map
+    </button>
   </div>
 
-  <!-- RIGHT SIDE — RESERVATION PANEL -->
-  <div class="panel-section">
+  <div class="search-bar">
+    <mat-form-field appearance="outline" class="location-field">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput placeholder="Where are you going?" formControlName="locationQuery">
+    </mat-form-field>
 
-    <h2 class="panel-title">Reservation Overview</h2>
+    <mat-form-field appearance="outline">
+      <mat-label>Date range</mat-label>
+      <mat-date-range-input [formGroup]="reservationForm.get('dateRange')" [rangePicker]="picker">
+        <input matStartDate placeholder="Check-in">
+        <input matEndDate placeholder="Check-out">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
 
-    <!-- CALENDAR SECTION -->
-    <div class="calendar-wrapper">
-      <h3>Your Reservations</h3>
+    <button mat-raised-button color="primary" class="search-btn" (click)="search()">Search</button>
+  </div>
 
-      <div class="calendar-grid">
-        <div 
-          *ngFor="let day of calendarDays" 
-          class="calendar-day"
-          [ngClass]="{
-            'has-reservation': day.reservation,
-            'has-request': day.request
-          }"
-        >
-          <div class="day-number">{{ day.day }}</div>
+  <div *ngIf="searchResults.length && !showMap" class="results-container">
 
-          <!-- Approved Reservation -->
-          <div *ngIf="day.reservation" class="reservation-tag">
-            Reserved
+    <div class="booking-card" *ngFor="let loc of searchResults">
+      <div class="card-image-wrapper">
+        <div class="image-carousel" *ngIf="loc.imageUrls && loc.imageUrls.length > 0; else noImage">
+          <img [src]="loc.imageUrls[loc.currentImageIndex!]" alt="Location Preview">
+
+          <button class="nav-btn prev" *ngIf="loc.imageUrls.length > 1" (click)="prevImage($event, loc)">‹</button>
+          <button class="nav-btn next" *ngIf="loc.imageUrls.length > 1" (click)="nextImage($event, loc)">›</button>
+
+          <div class="dots" *ngIf="loc.imageUrls.length > 1">
+            <span *ngFor="let img of loc.imageUrls; let i = index" [class.active]="i === loc.currentImageIndex"></span>
           </div>
+        </div>
 
-          <!-- Pending Request -->
-          <div *ngIf="day.request" class="request-tag">
-            Request
+        <ng-template #noImage>
+          <div class="placeholder-image">
+            <mat-icon>image_not_supported</mat-icon>
+            <span>No photos</span>
           </div>
+        </ng-template>
+      </div>
+
+      <div class="card-details">
+        <div class="header-row">
+          <h3>{{ loc.name }}</h3>
+          <span class="badge-type">{{ loc.location_type }}</span>
+        </div>
+
+        <div class="location-row">
+          <a class="link-address">{{ loc.address }}</a>
+          <span class="distance-text"> • 2.5 km from center</span>
+        </div>
+
+        <div class="tags-row">
+          <span class="tag">Capacity: {{ loc.capacity }} ppl</span>
+          <span class="tag success">Free Cancellation</span>
+        </div>
+
+        <div class="description-preview">
+          <p>Perfect for large events, conferences, and weddings. Located in the heart of the city.</p>
+        </div>
+      </div>
+
+      <div class="card-pricing">
+        <div class="rating-box">
+          <div class="text">
+            <span class="grade">Excellent</span>
+            <span class="reviews">14 reviews</span>
+          </div>
+          <div class="score">9.2</div>
+        </div>
+
+        <div class="price-box">
+          <span class="price-label">Starting from</span>
+          <span class="price-value">€ 450</span>
+          <span class="price-detail">per day</span>
+
+          <button mat-raised-button color="primary">
+            See availability <mat-icon iconPositionEnd>chevron_right</mat-icon>
+          </button>
         </div>
       </div>
     </div>
-
-    <!-- UPCOMING LIST -->
-    <div class="list-section">
-      <h3>Upcoming Bookings</h3>
-
-      <div *ngFor="let r of upcomingReservations" class="reservation-card">
-        <p class="res-title">{{ r.locationName }}</p>
-        <p class="res-date">{{ r.date }}</p>
-        <p class="res-status" [ngClass]="r.status">{{ r.status | uppercase }}</p>
-      </div>
-    </div>
-
   </div>
 
+  <div #mapViewNode id="mapViewNode" [class.fullscreen]="showMap" *ngIf="showMap" class="map-container">
+    <button class="close-btn-main" (click)="toggleMap()">x Close Map</button>
+    <div class="backdrop" *ngIf="selectedLocation" (click)="closePanel()"></div>
+
+    <div class="side-panel" *ngIf="selectedLocation">
+      <div class="panel-header">
+        <h2>{{ selectedLocation.name }}</h2>
+        <button class="close-icon-btn" (click)="closePanel()">✕</button>
+      </div>
+
+      <img *ngIf="selectedLocationImage" [src]="selectedLocationImage" class="panel-img" />
+
+      <div class="panel-content">
+        <p><strong>Address:</strong> {{ selectedLocation.address }}</p>
+        <p><strong>Capacity:</strong> {{ selectedLocation.capacity }}</p>
+        <p><strong>Type:</strong> {{ selectedLocation.location_type }}</p>
+        <button mat-raised-button color="primary" class="full-width-btn">
+          Reserve Now
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
