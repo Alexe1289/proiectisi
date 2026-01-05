@@ -48,6 +48,7 @@ testem.log
 Thumbs.db
 
 # Backend
+bacjend/venv/
 backend/__pycache__/
 backend/venv/bin/flask
 backend/venv/bin/pip
