@@ -48,7 +48,7 @@ export class AppComponent {
   role: string = 'guest';
   currentRole: string = 'guest';
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(public router: Router, private authService: AuthService) {
     this.authService.role$.subscribe(role => {
       this.role = role;
       this.currentRole = role;
@@ -62,17 +62,25 @@ export class AppComponent {
     });
   }
 
-  // See app.component.html
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('auth_token');
+    return this.role !== 'guest';
+  }
+
+  logoutFromApp() {
+    this.authService.logout();
+    this.router.navigate(['/home']);
   }
 
   get visibleTabs(): ITab[] {
     return this.tabs.filter(tab => tab.roles.includes(this.role));
+  }
+
+  get centerTabs(): ITab[] {
+    return this.visibleTabs.filter(tab => tab.link !== '/login' && tab.link !== '/register');
   }
 
 }

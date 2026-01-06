@@ -1,21 +1,37 @@
 <div class="login-container">
-  <h2>Login</h2>
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Welcome Back</mat-card-title>
+      <mat-card-subtitle>Please enter your credentials to login</mat-card-subtitle>
+    </mat-card-header>
 
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input id="email" type="email" name="email" [(ngModel)]="email" required>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" name="email" [(ngModel)]="email" required placeholder="email@example.com">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" name="password" [(ngModel)]="password" required>
+          <mat-icon matSuffix>lock</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid" class="submit-btn">
+          Login
+        </button>
+
+        <div class="register-link">
+          Don't have an account? <a routerLink="/register">Register here</a>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <div *ngIf="message" [ngClass]="{'status-msg': true, 'success': success, 'error': !success}">
+      {{ message }}
     </div>
-
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input id="password" type="password" name="password" [(ngModel)]="password" required>
-    </div>
-
-    <button type="submit">Login</button>
-  </form>
-
-  <p *ngIf="message" [ngClass]="{'success': success, 'error': !success}">
-    {{ message }}
-  </p>
+  </mat-card>
 </div>

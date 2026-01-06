@@ -29,6 +29,8 @@ import { CalendarComponent } from './shared/calendar/calendar.component';
 
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -57,6 +59,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     BrowserAnimationsModule,
     MatCheckboxModule,
     MatDatepickerModule,
+    MatCardModule,
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

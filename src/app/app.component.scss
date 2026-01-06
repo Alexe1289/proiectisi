@@ -1,4 +1,92 @@
-.title {
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: center;
+/* Quick reset to prevent width issues */
+* {
+  box-sizing: border-box;
+}
+
+.navbar {
+  height: 64px;
+  width: 100%;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Distribute the 3 sections */
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden; /* Prevents accidental scrolling */
+}
+
+/* LEFT */
+.navbar-left {
+  flex-shrink: 0;
+  cursor: pointer;
+  img {
+    height: 36px;
+    width: auto;
+    display: block;
+  }
+}
+
+/* CENTER */
+.navbar-center {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex: 1; /* Occupies the middle space */
+  margin: 0 15px;
+
+  .nav-link {
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    color: #555;
+    white-space: nowrap; /* Prevents text from breaking into two lines */
+    transition: color 0.2s;
+
+    &:hover { color: #1976d2; }
+  }
+
+  .active-link {
+    color: #1976d2;
+    font-weight: 600;
+    border-bottom: 2px solid #1976d2;
+    padding-bottom: 4px;
+  }
+}
+
+/* RIGHT */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; /* Prevents the section from shrinking */
+}
+
+.auth-group {
+  display: flex;
+  gap: 8px;
+}
+
+.role-box {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #d4af37;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b8860b;
+  background-color: rgba(212, 175, 55, 0.05);
+  white-space: nowrap;
+  margin-left: 8px; /* Left spacing */
+}
+
+/* RESPONSIVENESS: Adjustments for smaller screens */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 12px;
+  }
+  .navbar-center {
+    gap: 10px;
+    font-size: 13px;
+  }
 }

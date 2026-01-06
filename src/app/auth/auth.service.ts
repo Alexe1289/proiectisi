@@ -20,4 +20,9 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !(this.getRole()=='guest');
   }
+
+  logout() {
+    this.setRole('guest');
+    localStorage.removeItem('token');
+  }
 }

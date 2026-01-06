@@ -39,8 +39,4 @@ export class HomeComponent {
         this.router.navigate(['/reservation']);
     }
 
-    logout() {
-        this.authService.setRole('guest');
-        this.router.navigate(['/home']);
-    }
 }
