@@ -25,6 +25,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from "./pages/login/login.component";
 import { ReservationComponent } from "./pages/reservation/reservation.component";
+import { CalendarComponent } from './shared/calendar/calendar.component';
+
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
@@ -35,6 +39,7 @@ import { ReservationComponent } from "./pages/reservation/reservation.component"
     RegisterComponent,
     LoginComponent,
     ReservationComponent,
+    CalendarComponent,
   ],
   imports: [
     BrowserModule,
@@ -49,7 +54,9 @@ import { ReservationComponent } from "./pages/reservation/reservation.component"
     FlexLayoutModule,
     AngularFireModule.initializeApp(environment.firebase, 'AngularDemoFirebase'),
     AngularFireDatabaseModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

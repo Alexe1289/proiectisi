@@ -1,0 +1,63 @@
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); // 7 zile pe rând
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.day {
+  padding: 10px;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.1s;
+}
+
+.day:hover {
+  transform: scale(1.05);
+}
+
+.available {
+  background: #e8f5e9; // verde deschis
+}
+
+.pending {
+  background: #fff3cd; // galben
+  cursor: not-allowed;
+}
+
+.booked {
+  background: #f8d7da; // roșu
+  cursor: not-allowed;
+}
+
+.past {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.selected {
+  outline: 2px solid #1976d2;
+  font-weight: bold;
+}
+
+.weekday {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.day-number {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.month {
+  font-size: 11px;
+}

@@ -3,17 +3,3 @@
     <!-- The DIV that will contain the map -->
     <div #mapViewNode class="map-view"></div>
 </div>
-
-<!-- Floating Action Button (FAB) -->
-<div style="position: absolute; right: 12px; top: 12px; z-index: 200; display:flex; gap:8px;">
-    <button class="fab" (click)="clearRouter()">x</button>
-    <button class="fab" mat-raised-button color="primary" (click)="addCenterAsPoint()">Add center</button>
-</div>
-
-<select name="places-select" id="places-select">
-    <option value="Parks and Outdoors">Parks and Outdoors</option>
-    <option value="Coffee shop">Coffee shop</option>
-    <option value="Gas station">Gas station</option>
-    <option value="Food">Food</option>
-    <option value="Hotel">Hotel</option>
-</select>
