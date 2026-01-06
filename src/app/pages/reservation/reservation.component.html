@@ -9,7 +9,7 @@
   <div class="search-bar">
     <mat-form-field appearance="outline" class="location-field">
       <mat-icon matPrefix>search</mat-icon>
-      <input matInput placeholder="Where are you going?" formControlName="locationQuery">
+      <input matInput placeholder="Location for event" formControlName="locationQuery">
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -56,12 +56,10 @@
 
         <div class="location-row">
           <a class="link-address">{{ loc.address }}</a>
-          <span class="distance-text"> • 2.5 km from center</span>
         </div>
 
         <div class="tags-row">
           <span class="tag">Capacity: {{ loc.capacity }} ppl</span>
-          <span class="tag success">Free Cancellation</span>
         </div>
 
         <div class="description-preview">
@@ -70,13 +68,6 @@
       </div>
 
       <div class="card-pricing">
-        <div class="rating-box">
-          <div class="text">
-            <span class="grade">Excellent</span>
-            <span class="reviews">14 reviews</span>
-          </div>
-          <div class="score">9.2</div>
-        </div>
 
         <div class="price-box">
           <span class="price-label">Starting from</span>
@@ -84,7 +75,7 @@
           <span class="price-detail">per day</span>
 
           <button mat-raised-button color="primary">
-            See availability <mat-icon iconPositionEnd>chevron_right</mat-icon>
+            Reserve <mat-icon iconPositionEnd>chevron_right</mat-icon>
           </button>
         </div>
       </div>

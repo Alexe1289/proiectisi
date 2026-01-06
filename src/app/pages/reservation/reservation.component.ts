@@ -9,7 +9,7 @@ import FeatureFilter from '@arcgis/core/layers/support/FeatureFilter.js';
 
 // Interface to extend the location data with UI specific properties
 interface LocationResult {
-  OBJECTID: number;
+  arcgis_feature_id: number;
   name: string;
   address: string;
   capacity: number;
@@ -38,7 +38,7 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
   selectedLocation: any = null;
   selectedLocationImage: string | null = null;
 
-  private readonly ARCGIS_TOKEN = 'mzFcMRqhxzPAoRJavp2MJimJ161_xQX9HpQnjt-dpoUXn4C1DV-VDz3hET-d-iJ23Etq93Eezd6hTQHUDWdR0_BQttAgZ77ogaW7SiwL6-eKYm3b4dEMRND94CDU0_yQFTIkcaiYjr6bSXfhlDiFtCLhrqNbf13A8ZCKnLkoqiVEz_5wYye_yFW8bRptnI4F';
+  private readonly ARCGIS_TOKEN = 'mzFcMRqhxzPAoRJavp2MJimJ161_xQX9HpQnjt-dpoUXn4C1DV-VDz3hET-d-iJ23Etq93Eezd6hTQHUDWdR08uzE7XvkuEokieQAoYhSEI0aDJo8roTY88AZfLSu7ZAFZCQ8luovHg4PBull3XujCdvSl5HshRWlehQTUm8SNHfosdYxTZJyhzeqdy7uD91';
   private readonly apiKey = 'AAPTxy8BH1VEsoebNVZXo8HurJWqcGsDXcgXORUKOHbx4SEyKajspwDLD_FV7kULXZy8YJalSsjCnjmJmmdMu_sovrAGh6NI6FVe1YzcpE8q9yLdbS7A8OwUYSqOGHxv4CA9lFsAB0P01OVZ0CsH9MNqZ-AEFs4cedGv8iHP93cLVe8J1mRIAhmzxNt6ZBLPsIAaffldLkParSywYEK8DqrMRH1f1fuLYkApbnPEKjhL55Y.AT1_Ji8b2dCj';
 
   private readonly featureLayerUrl = 'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente2/FeatureServer/0';
@@ -92,19 +92,22 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
   // --- Image Carousel Logic ---
 
   async hydrateLocationWithImages(location: LocationResult) {
-    if (!location.OBJECTID) {
+    console.log(`Loading images for location: ${location.name}`);
+    if (!location.arcgis_feature_id) {
+      console.warn(`Location ${location.name} missing arcgis_feature_id`);
       location.loadingImages = false;
       return;
     }
 
     try {
-      const listUrl = `${this.featureLayerUrl}/${location.OBJECTID}/attachments?f=json&token=${this.ARCGIS_TOKEN}`;
+      const listUrl = `${this.featureLayerUrl}/${location.arcgis_feature_id}/attachments?f=json&token=${this.ARCGIS_TOKEN}`;
       const res = await fetch(listUrl);
       const json = await res.json();
-
+      console.log('Attachments');
       if (json.attachmentInfos && json.attachmentInfos.length > 0) {
+        console.log(`Found ${json.attachmentInfos.length} attachments for ${location.name}`);
         location.imageUrls = json.attachmentInfos.map((att: any) =>
-          `${this.featureLayerUrl}/${location.OBJECTID}/attachments/${att.id}?token=${this.ARCGIS_TOKEN}`
+          `${this.featureLayerUrl}/${location.arcgis_feature_id}/attachments/${att.id}?token=${this.ARCGIS_TOKEN}`
         );
       }
     } catch (error) {
@@ -191,7 +194,7 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
       });
       selectedLocationOID = graphic.attributes.OBJECTID;
 
-      await this.loadAttachments(graphic.attributes.OBJECTID);
+      // await this.loadAttachments(graphic.attributes.OBJECTID);
 
       this.mapView.goTo({
         target: graphic.geometry,
@@ -215,8 +218,10 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
     const attachments = json.attachmentInfos;
     if (!attachments || !attachments.length) {
       this.selectedLocationImage = null;
+      console.log('No attachments found for selected location');
       return;
     }
+    console.log('Attachments found:', attachments);
     const attachmentId = attachments[0].id;
     this.selectedLocationImage = `${this.featureLayerUrl}/${objectId}/attachments/${attachmentId}?token=${this.ARCGIS_TOKEN}`;
   }
