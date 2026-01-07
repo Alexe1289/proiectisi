@@ -1,0 +1,98 @@
+<div class="profile-container">
+  <mat-card class="profile-card">
+    <div class="profile-header">
+    <div class="avatar-circle generic-user">
+        <mat-icon>person</mat-icon>
+    </div>
+    <mat-card-title>{{ userData.name }}</mat-card-title>
+    <mat-card-subtitle>{{ userData.role | titlecase }} Account</mat-card-subtitle>
+    </div>
+
+    <mat-card-content>
+      <div class="info-box" [class.editing]="isEditMode">
+        
+        <div class="info-row">
+          <label>Full Name</label>
+          <div class="value-container">
+            <span *ngIf="!isEditMode">{{ userData.name }}</span>
+            <mat-form-field *ngIf="isEditMode" appearance="outline">
+              <input matInput [(ngModel)]="userData.name" name="name">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <label>Email Address</label>
+          <div class="value-container">
+            <span class="readonly-text">{{ userData.email }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <label>Phone Number</label>
+          <div class="value-container">
+            <span *ngIf="!isEditMode">{{ userData.phone || 'Not provided' }}</span>
+            <mat-form-field *ngIf="isEditMode" appearance="outline">
+              <input matInput [(ngModel)]="userData.phone" name="phone">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <label>Account Role</label>
+          <div class="value-container">
+            <span class="role-badge">{{ userData.role | titlecase }}</span>
+          </div>
+        </div>
+      </div>
+
+<div class="password-wrapper" *ngIf="!isEditMode">
+        <button mat-button class="toggle-pass-btn" (click)="togglePasswordChange()">
+          <mat-icon>{{ showPasswordChange ? 'expand_less' : 'lock' }}</mat-icon>
+          {{ showPasswordChange ? 'Cancel Password Change' : 'Change Password' }}
+        </button>
+
+        <div class="password-card-inner" *ngIf="showPasswordChange">
+          <mat-form-field appearance="outline">
+            <mat-label>Current Password</mat-label>
+            <input matInput type="password" [(ngModel)]="passwordData.currentPassword">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>New Password</mat-label>
+            <input matInput type="password" [(ngModel)]="passwordData.newPassword">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Confirm New Password</mat-label>
+            <input matInput type="password" [(ngModel)]="passwordData.confirmPassword">
+          </mat-form-field>
+
+          <button mat-raised-button color="warn" class="update-pass-btn"
+                  [disabled]="!passwordData.currentPassword || !passwordData.newPassword"
+                  (click)="onChangePassword()">
+            Update Password
+          </button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" *ngIf="!isEditMode" (click)="isEditMode = true">
+          <mat-icon>edit</mat-icon> Edit Profile
+        </button>
+
+        <button mat-raised-button color="accent" *ngIf="isEditMode" (click)="saveChanges()">
+          <mat-icon>save</mat-icon> Save Changes
+        </button>
+
+        <button mat-button *ngIf="isEditMode" (click)="isEditMode = false">
+          Cancel
+        </button>
+      </div>
+
+      <div *ngIf="message" [ngClass]="{'status-msg': true, 'success': success, 'error': !success}">
+        {{ message }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

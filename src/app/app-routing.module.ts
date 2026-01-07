@@ -8,6 +8,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { ReservationComponent } from './pages/reservation/reservation.component';
 import { AuthGuard } from './auth/auth.guard';
 import { ROLES } from './auth/roles';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 export const routes: Routes = [
   {
@@ -44,6 +45,12 @@ export const routes: Routes = [
     component: ReservationComponent,
     canActivate: [AuthGuard],
     data: { roles: [ROLES.CLIENT] }
+  },
+    {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [ROLES.CLIENT, ROLES.PROVIDER] }
   },
   {
     path: '',

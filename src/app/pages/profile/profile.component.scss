@@ -1,0 +1,171 @@
+/* PAGE LAYOUT */
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 64px);
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 550px;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  .avatar-circle {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 12px;
+  }
+}
+
+/* DATA BOX STYLING */
+.info-box {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  overflow: hidden;
+  margin-bottom: 24px;
+
+  &.editing {
+    border-color: #1976d2;
+    background-color: #fff;
+  }
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  label {
+    width: 140px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value-container {
+    flex: 1;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+
+    span.readonly-text {
+      color: #999;
+    }
+
+    .role-badge {
+      background-color: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: -1.25em;
+    }
+  }
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  
+  button {
+    min-width: 140px;
+    padding: 8px 16px;
+  }
+}
+
+/* STATUS MESSAGES */
+.status-msg {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  
+  &.success { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+  &.error { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+}
+
+/* PASSWORD SECTION WRAPPER */
+.password-wrapper {
+  margin: 10px 0 25px 0; /* Vertical spacing to separate from info-box and actions */
+  padding: 15px;
+  background-color: #fcfcfc;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .toggle-pass-btn {
+    color: #d32f2f;
+    margin-bottom: 5px;
+  }
+}
+
+/* INNER PASSWORD FIELDS */
+.password-card-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 5px;
+  animation: slideDown 0.3s ease-out;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .update-pass-btn {
+    margin-top: 10px;
+    height: 48px;
+    border-radius: 8px;
+  }
+}
+
+/* ANIMATION */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure the main actions stay at the bottom with enough space */
+.actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}

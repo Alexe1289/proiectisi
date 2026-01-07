@@ -18,6 +18,7 @@ import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from "src/environments/environment";
 import { ProviderComponent } from "./pages/providers/provider.component";
 import { RegisterComponent } from './pages/register/register.component';
+import { ProfileComponent } from "./pages/profile/profile.component";
 
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from "./material.module";
@@ -31,6 +32,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip'; 
 
 @NgModule({
   declarations: [
@@ -42,6 +44,7 @@ import { MatIconModule } from '@angular/material/icon';
     LoginComponent,
     ReservationComponent,
     CalendarComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -61,6 +64,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatDatepickerModule,
     MatCardModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

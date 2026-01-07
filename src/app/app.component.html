@@ -22,9 +22,14 @@
       <button mat-raised-button color="warn" (click)="logoutFromApp()" matTooltip="Logout">Logout</button>
     </div>
 
-    <div class="role-box">
+    <div class="role-box" 
+        [class.clickable]="isLoggedIn()" 
+        [style.cursor]="isLoggedIn() ? 'pointer' : 'default'"
+        (click)="isLoggedIn() ? router.navigate(['/profile']) : null" 
+        [matTooltip]="isLoggedIn() ? 'Go to Profile' : ''">
       {{ currentRole | titlecase }}
     </div>
+
   </div>
   
 </header>
