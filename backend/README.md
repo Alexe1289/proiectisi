@@ -221,6 +221,19 @@ The server listens on `http://localhost:5001`.
 ]
 ```
 
+### 11. GET /api/client/locations/available (JWT required)
+- Description: Returns locations but filtered, you can filter by: `capacity` (you insert a minimum value), `location_type`, `datetime` (insert a specific day), `start_datetime` and `end_datetime` (insert day and hour for both ends) (client only).
+- FYI: <B> datetime has priority over interval </B>
+- Example full input:
+```
+/api/client/locations/available?
+capacity=50&
+location_type=conference&
+datetime=2026-01-10&
+start_datetime=2026-01-10T10:00&
+end_datetime=2026-01-10T14:00
+```
+- Response is identitical with `GET /api/client/locations`
 ---
 
 > All endpoints marked with JWT require an `Authorization: Bearer <token>` header.

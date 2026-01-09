@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from sqlalchemy import and_, not_, exists
 import bcrypt
 from models import *
 from datetime import datetime
+from datetime import timedelta
 
 app = Flask(__name__)
 CORS(
@@ -207,6 +209,72 @@ def get_locations_for_clients():
     ]
 
     return jsonify(result)
+
+@app.route("/api/client/locations/available", methods=["GET"])
+@jwt_required()
+def get_available_locations():
+    user_id, role = get_user()
+
+    if role != "client":
+        return jsonify({"msg": "Only clients can access locations!"}), 403
+
+    # query params
+    capacity = request.args.get("capacity", type=int)
+    location_type = request.args.get("location_type")
+    dt = request.args.get("datetime")
+    start_dt = request.args.get("start_datetime")
+    end_dt = request.args.get("end_datetime")
+
+    query = Location.query
+
+    # filter by capacity
+    if capacity is not None:
+        query = query.filter(Location.capacity >= capacity)
+
+    # filter by type
+    if location_type:
+        query = query.filter(Location.location_type == location_type)
+
+    # availability filter
+    if dt:
+        # filter on a specific day
+        day = datetime.fromisoformat(dt)
+        start_dt = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_dt = start_dt + timedelta(days=1)
+
+    elif start_dt and end_dt:
+        # filter on a specific interval
+        start_dt = datetime.fromisoformat(start_dt)
+        end_dt = datetime.fromisoformat(end_dt)
+
+    else:
+        start_dt = end_dt = None
+
+
+    if start_dt and end_dt:
+        conflicting_reservations = (
+            db.session.query(Reservation)
+            .filter(
+                Reservation.location_id == Location.location_id,
+                Reservation.start_datetime < end_dt,
+                Reservation.end_datetime > start_dt
+            )
+        )
+
+        query = query.filter(~conflicting_reservations.exists())
+
+    locations = query.all()
+
+    result = [
+        {
+            "arcgis_feature_id": loc.arcgis_feature_id,
+            "name": loc.name,
+        }
+        for loc in locations
+    ]
+
+    return jsonify(result)
+
 
 @app.route("/api/client/locations/<string:arcgis_feature_id>", methods=["GET"])
 @jwt_required()
