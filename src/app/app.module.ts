@@ -32,6 +32,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ArcgisAuthService } from "./services/arcgis-auth.service";
 
 @NgModule({
   declarations: [
@@ -42,6 +45,7 @@ import { MatIconModule } from '@angular/material/icon';
     RegisterComponent,
     LoginComponent,
     ReservationComponent,
+    ReservationDetailComponent
   ],
   imports: [
     BrowserModule,
@@ -62,9 +66,10 @@ import { MatIconModule } from '@angular/material/icon';
     MatFormFieldModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatIconModule
+    MatIconModule,
+    MatDialogModule
   ],
-  providers: [],
+  providers: [ArcgisAuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

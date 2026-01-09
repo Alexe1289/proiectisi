@@ -1,0 +1,161 @@
+<div class="detail-page">
+    <div class="top-nav">
+        <button mat-button (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon> Back to search results
+        </button>
+    </div>
+
+    <div class="content-grid">
+
+        <div class="left-column">
+            <div class="header-section">
+                <h1>{{ property.name }}</h1>
+                <div class="sub-header">
+                    <mat-icon>location_on</mat-icon>
+                    <span>{{ property.address }}</span>
+                </div>
+            </div>
+
+            <div class="gallery-section">
+
+                <div class="main-image-container">
+                    <ng-container *ngIf="property.images && property.images.length > 0; else noDetailImage">
+                        <img [src]="property.images[currentImageIndex]" alt="Property Main View" class="main-img">
+
+                        <button class="nav-btn prev" *ngIf="property.images.length > 1" (click)="prevImage()">
+                            <mat-icon>chevron_left</mat-icon>
+                        </button>
+                        <button class="nav-btn next" *ngIf="property.images.length > 1" (click)="nextImage()">
+                            <mat-icon>chevron_right</mat-icon>
+                        </button>
+
+                        <div class="image-counter">
+                            <mat-icon>photo_library</mat-icon>
+                            <span>{{ currentImageIndex + 1 }} / {{ property.images.length }}</span>
+                        </div>
+                    </ng-container>
+
+                    <ng-template #noDetailImage>
+                        <div class="no-image-state">
+                            <mat-icon>image_not_supported</mat-icon>
+                            <span>No photos available</span>
+                        </div>
+                    </ng-template>
+                </div>
+
+                <div class="thumbnails-track" *ngIf="property.images && property.images.length > 1">
+                    <div class="thumbnail-card" *ngFor="let img of property.images; let i = index"
+                        [class.active]="i === currentImageIndex" (click)="currentImageIndex = i">
+                        <img [src]="img" alt="Thumbnail">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="map-section">
+                <h3>Location on Map</h3>
+                <div #detailMapView class="detail-map-view"></div>
+            </div>
+
+            <div class="section">
+                <h3>About this property</h3>
+                <p class="description-text">{{ property.description }}</p>
+
+                <div class="amenities-grid">
+                    <div class="amenity"><mat-icon>people</mat-icon> Up to {{property.capacity}} Guests</div>
+                    <div class="amenity"><mat-icon>people</mat-icon> Up to 300 Guests</div>
+
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="section owner-section">
+                <h3>Hosted by {{ property.provider.name }}</h3>
+                <div class="owner-card">
+                    <div class="avatar-circle">{{ property.provider.name.charAt(0) }}</div>
+                    <div class="owner-details">
+                        <p><strong>Phone:</strong> {{ property.provider.phone }}</p>
+                        <p><strong>Email:</strong> {{ property.provider.email }}</p>
+                    </div>
+                    <button mat-stroked-button>Contact Host</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="offer-card">
+                <div class="card-header">
+                    <div class="price-display">
+                        <span class="currency">€</span>
+                        <span class="amount">{{ property.pricePerDay }}</span>
+                        <span class="unit">/ day</span>
+                    </div>
+                    <div class="status">Available</div>
+                </div>
+
+                <form [formGroup]="offerForm" (ngSubmit)="makeOffer()">
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Event Dates</mat-label>
+                            <mat-date-range-input [formGroup]="offerForm.get('dateRange')" [rangePicker]="picker">
+                                <input matStartDate formControlName="start" placeholder="Start date">
+                                <input matEndDate formControlName="end" placeholder="End date">
+                            </mat-date-range-input>
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-date-range-picker #picker></mat-date-range-picker>
+
+                            <mat-error *ngIf="offerForm.get('dateRange.start')?.hasError('required')">
+                                Start date is required
+                            </mat-error>
+                            <mat-error *ngIf="offerForm.get('dateRange.end')?.hasError('required')">
+                                End date is required
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Number of Guests</mat-label>
+                            <input matInput type="number" formControlName="guestCount" placeholder="Ex. 150">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="offer-box">
+                        <h4>Make an Offer</h4>
+                        <p class="hint">Propose a price to the owner</p>
+
+                        <mat-form-field appearance="outline" class="full-width price-input">
+                            <span matPrefix>€ &nbsp;</span>
+                            <input matInput type="number" formControlName="priceOffer">
+                        </mat-form-field>
+                    </div>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Message to owner (optional)</mat-label>
+                        <textarea matInput formControlName="message" rows="3"
+                            placeholder="Hi, I'm interested in booking..."></textarea>
+                    </mat-form-field>
+
+                    <button mat-raised-button color="primary" class="submit-btn" type="submit">
+                        Send Offer
+                    </button>
+
+                    <p class="disclaimer">You won't be charged yet</p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <ng-template #successDialog>
+        <div class="success-dialog-content">
+            <mat-icon class="success-icon">check_circle</mat-icon>
+            <h2>Offer Sent!</h2>
+            <p>Your offer has been successfully sent to the owner. They will review it and contact you shortly.</p>
+
+            <button mat-raised-button color="primary" class="done-btn" [mat-dialog-close]="true">
+                Back to Search Results
+            </button>
+        </div>
+    </ng-template>
+</div>

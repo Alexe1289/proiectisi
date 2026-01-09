@@ -204,15 +204,17 @@ def get_locations_for_clients():
 
     return jsonify(result)
 
-@app.route("/api/client/locations/<int:loc_id>", methods=["GET"])
+@app.route("/api/client/locations/<int:arcgis_feature_id>", methods=["GET"])
 @jwt_required()
-def get_location_details(loc_id):   
+def get_location_details(arcgis_feature_id):   
     user_id, role = get_user()
 
     if role != "client":
         return jsonify({"msg": "Only clients can view location details!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(
+        arcgis_feature_id=arcgis_feature_id
+    ).first()
     
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404
@@ -227,7 +229,8 @@ def get_location_details(loc_id):
         "location_type": loc.location_type,
         "provider": {
             "name": loc.provider.name,
-            "email": loc.provider.email
+            "email": loc.provider.email,
+            "phone": loc.provider.phone
         }
     }
 

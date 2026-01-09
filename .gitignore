@@ -48,24 +48,7 @@ testem.log
 Thumbs.db
 
 # Backend
-bacjend/venv/*
+backend/venv/*
 backend/__pycache__/
-backend/venv/bin/flask
-backend/venv/bin/pip
-backend/venv/bin/pip3
-backend/venv/bin/pip3.12
-backend/venv/bin/python
-backend/venv/bin/python3
-backend/venv/bin/python3.12
-backend/venv/lib/python3.12/site-packages/bcrypt/_bcrypt.abi3.so
-backend/venv/lib/python3.12/site-packages/greenlet/_greenlet.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/greenlet/tests/_test_extension.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/greenlet/tests/_test_extension_cpp.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/markupsafe/_speedups.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/sqlalchemy/cyextension/collections.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/sqlalchemy/cyextension/immutabledict.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/sqlalchemy/cyextension/processors.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/sqlalchemy/cyextension/resultproxy.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/sqlalchemy/cyextension/util.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib/python3.12/site-packages/zope/interface/_zope_interface_coptimizations.cpython-312-x86_64-linux-gnu.so
-backend/venv/lib64
+package-lock.json
+package.json

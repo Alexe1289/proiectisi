@@ -74,7 +74,7 @@
           <span class="price-value">€ 450</span>
           <span class="price-detail">per day</span>
 
-          <button mat-raised-button color="primary">
+          <button mat-raised-button color="primary" [routerLink]="['/reservation', loc.arcgis_feature_id]">
             Reserve <mat-icon iconPositionEnd>chevron_right</mat-icon>
           </button>
         </div>
@@ -83,24 +83,58 @@
   </div>
 
   <div #mapViewNode id="mapViewNode" [class.fullscreen]="showMap" *ngIf="showMap" class="map-container">
-    <button class="close-btn-main" (click)="toggleMap()">x Close Map</button>
+    <button class="close-btn-main" (click)="toggleMap()">
+      <mat-icon>close</mat-icon> Close Map
+    </button>
+
     <div class="backdrop" *ngIf="selectedLocation" (click)="closePanel()"></div>
 
     <div class="side-panel" *ngIf="selectedLocation">
-      <div class="panel-header">
-        <h2>{{ selectedLocation.name }}</h2>
+
+      <div class="panel-image-wrapper">
+        <div class="image-carousel" *ngIf="selectedLocationImages.length > 0; else noMapImage">
+          <img [src]="selectedLocationImages[selectedImageIndex]" alt="Location Preview">
+
+          <button class="nav-btn prev" *ngIf="selectedLocationImages.length > 1" (click)="prevMapImage()">‹</button>
+          <button class="nav-btn next" *ngIf="selectedLocationImages.length > 1" (click)="nextMapImage()">›</button>
+
+          <div class="dots" *ngIf="selectedLocationImages.length > 1">
+            <span *ngFor="let img of selectedLocationImages; let i = index"
+              [class.active]="i === selectedImageIndex"></span>
+          </div>
+        </div>
+
+        <ng-template #noMapImage>
+          <div class="placeholder-image">
+            <mat-icon>image_not_supported</mat-icon>
+            <span>No photos</span>
+          </div>
+        </ng-template>
+
         <button class="close-icon-btn" (click)="closePanel()">✕</button>
       </div>
 
-      <img *ngIf="selectedLocationImage" [src]="selectedLocationImage" class="panel-img" />
-
       <div class="panel-content">
-        <p><strong>Address:</strong> {{ selectedLocation.address }}</p>
-        <p><strong>Capacity:</strong> {{ selectedLocation.capacity }}</p>
-        <p><strong>Type:</strong> {{ selectedLocation.location_type }}</p>
-        <button mat-raised-button color="primary" class="full-width-btn">
-          Reserve Now
-        </button>
+        <h2>{{ selectedLocation.name }}</h2>
+
+        <div class="info-row">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ selectedLocation.address }}</span>
+        </div>
+
+        <div class="tags">
+          <span class="badge">{{ selectedLocation.location_type }}</span>
+          <span class="badge outline">Capacity: {{ selectedLocation.capacity }}</span>
+        </div>
+
+        <div class="price-section">
+          <div class="price">
+            <span class="currency">€</span>450 <span class="period">/ day</span>
+          </div>
+          <button mat-raised-button color="primary" [routerLink]="['/reservation', selectedLocation.arcgis_feature_id]">
+            Reserve Now
+          </button>
+        </div>
       </div>
     </div>
   </div>

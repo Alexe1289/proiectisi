@@ -344,6 +344,9 @@
   }
 
   /* --- Map Container (Existing logic kept, styled slightly better) --- */
+  /* ... (Keep existing list styles) ... */
+
+  /* --- Map Container Styles --- */
   .map-container {
     width: 100%;
     height: 400px;
@@ -358,75 +361,233 @@
       z-index: 9999;
       background: white;
     }
-  }
 
-  .side-panel {
-    position: absolute;
-    top: 24px;
-    left: 24px;
-    width: 320px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    overflow: hidden;
-
-    .panel-header {
-      padding: 16px;
+    .close-btn-main {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 10000;
+      background: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #eee;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
 
-      h2 {
-        font-size: 18px;
-        margin: 0;
-      }
-
-      .close-icon-btn {
-        background: none;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
-        color: #666;
+      &:hover {
+        background: #f5f5f5;
       }
     }
 
-    .panel-img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-    }
+    /* --- Bottom Left Popup Panel --- */
+    .side-panel {
+      position: absolute;
+      /* Bottom Left Positioning */
+      bottom: 24px;
+      left: 24px;
+      top: auto;
+      /* Reset top */
+      transform: none;
+      /* Reset center transform if it existed */
 
-    .panel-content {
-      padding: 16px;
+      width: 340px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      z-index: 1000;
+      overflow: hidden;
+      animation: slideUp 0.3s ease-out;
 
-      p {
-        margin: 8px 0;
-        font-size: 14px;
+      /* 1. Carousel Header */
+      .panel-image-wrapper {
+        height: 200px;
+        position: relative;
+        background: #eee;
+
+        .image-carousel {
+          width: 100%;
+          height: 100%;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+              background: white;
+            }
+
+            &.prev {
+              left: 8px;
+            }
+
+            &.next {
+              right: 8px;
+            }
+          }
+
+          .dots {
+            position: absolute;
+            bottom: 8px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+
+            span {
+              width: 6px;
+              height: 6px;
+              background: rgba(255, 255, 255, 0.6);
+              border-radius: 50%;
+
+              &.active {
+                background: white;
+                transform: scale(1.2);
+              }
+            }
+          }
+        }
+
+        .placeholder-image {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #999;
+
+          mat-icon {
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+            margin-bottom: 4px;
+          }
+        }
+
+        .close-icon-btn {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: rgba(0, 0, 0, 0.5);
+          color: white;
+          border: none;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.7);
+          }
+        }
       }
 
-      .full-width-btn {
-        width: 100%;
-        margin-top: 16px;
+      /* 2. Content Body */
+      .panel-content {
+        padding: 16px;
+
+        h2 {
+          margin: 0 0 8px;
+          font-size: 18px;
+          color: #333;
+        }
+
+        .info-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 6px;
+          color: #555;
+          font-size: 13px;
+          margin-bottom: 12px;
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            margin-top: 1px;
+          }
+        }
+
+        .tags {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 16px;
+
+          .badge {
+            font-size: 11px;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #444;
+            font-weight: 500;
+
+            &.outline {
+              background: transparent;
+              border: 1px solid #ddd;
+            }
+          }
+        }
+
+        .price-section {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-top: 1px solid #eee;
+          padding-top: 12px;
+
+          .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+
+            .currency {
+              font-size: 14px;
+              vertical-align: top;
+            }
+
+            .period {
+              font-size: 12px;
+              color: #999;
+              font-weight: 400;
+            }
+          }
+        }
       }
     }
-  }
 
-  .close-btn-main {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 10000;
-    background: white;
-    color: #333;
-    border: 1px solid #ccc;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
 
-    &:hover {
-      background: #f0f0f0;
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
   }
 }

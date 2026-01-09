@@ -60,6 +60,43 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 		console.log("Fetched allowed location IDs from backend:", response);
 		return response?.map(r => r.arcgis_feature_id) ?? [];
 	}
+	async deleteLocationFromBackend(arcgis_feature_id: number) {
+		const headers = new HttpHeaders({
+			Authorization: `Bearer ${this.token}`
+		});
+
+		// Assuming your backend accepts DELETE requests at /api/provider/locations/:id
+		// If your backend expects the ID in the body, let me know and I can adjust this.
+		await this.http.delete(
+			`http://localhost:5001/api/provider/locations/${arcgis_feature_id}`,
+			{ headers }
+		).toPromise();
+
+		console.log("Location successfully deleted from backend. ID:", arcgis_feature_id);
+	}
+	async updateLocationInBackend(payload: {
+		name: string;
+		capacity: number;
+		description?: string | null;
+		address: string;
+		location_type: string;
+		arcgis_feature_id: number;
+	}) {
+		const headers = new HttpHeaders({
+			Authorization: `Bearer ${this.token}`,
+			"Content-Type": "application/json"
+		});
+
+		// We assume your backend accepts PUT requests at /api/provider/locations/:id
+		await this.http.put(
+			`http://localhost:5001/api/provider/locations/${payload.arcgis_feature_id}`,
+			payload,
+			{ headers }
+		).toPromise();
+
+		console.log("Location updated in backend:", payload);
+	}
+
 	async sendLocationToBackend(payload: {
 		name: string;
 		capacity: number;
@@ -188,34 +225,85 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 			this.view.ui.add(editor, 'top-right');
 			locationsLayer.on("edits", async (event) => {
+				console.log("Edits Event Fired:", event);
 
-				if (!event.addedFeatures || event.addedFeatures.length === 0) return;
+				if (event.addedFeatures && event.addedFeatures.length > 0) {
 
-				const added = event.addedFeatures[0];
+					const added = event.addedFeatures[0];
 
-				const objectId = added.objectId;
-				console.log("New ArcGIS feature created:", objectId);
+					const objectId = added.objectId;
+					console.log("New ArcGIS feature created:", objectId);
 
-				const result = await locationsLayer.queryFeatures({
-					objectIds: [objectId],
-					outFields: ["*"],
-					returnGeometry: false
-				});
+					const result = await locationsLayer.queryFeatures({
+						objectIds: [objectId],
+						outFields: ["*"],
+						returnGeometry: false
+					});
 
-				const feature = result.features[0];
-				const attrs = feature.attributes;
+					const feature = result.features[0];
+					const attrs = feature.attributes;
 
-				this.allowedLocationIds.push(objectId);
-				locationsLayer.definitionExpression = `OBJECTID IN (${this.allowedLocationIds.join(",")})`;
+					this.allowedLocationIds.push(objectId);
+					locationsLayer.definitionExpression = `OBJECTID IN (${this.allowedLocationIds.join(",")})`;
 
-				await this.sendLocationToBackend({
-					name: attrs.name,
-					capacity: attrs.capacity,
-					description: attrs.description ?? null,
-					address: attrs.address,
-					location_type: attrs.location_type,
-					arcgis_feature_id: objectId
-				});
+					await this.sendLocationToBackend({
+						name: attrs.name,
+						capacity: attrs.capacity,
+						description: attrs.description ?? null,
+						address: attrs.address,
+						location_type: attrs.location_type,
+						arcgis_feature_id: objectId
+					});
+				}
+				if (event.deletedFeatures && event.deletedFeatures.length > 0) {
+					console.log("Processing deleted features...");
+					for (const deleted of event.deletedFeatures) {
+						const objectId = deleted.objectId;
+						console.log("ArcGIS feature deleted:", objectId);
+
+						// 1. Remove from local allowed list so the map filter stays accurate
+						this.allowedLocationIds = this.allowedLocationIds.filter(id => id !== objectId);
+
+						// 2. Update definition expression immediately
+						if (this.allowedLocationIds.length === 0) {
+							locationsLayer.definitionExpression = "1 = 0";
+						} else {
+							locationsLayer.definitionExpression = `OBJECTID IN (${this.allowedLocationIds.join(",")})`;
+						}
+
+						// 3. Notify Backend
+						await this.deleteLocationFromBackend(objectId);
+					}
+				}
+				if (event.updatedFeatures && event.updatedFeatures.length > 0) {
+					for (const updated of event.updatedFeatures) {
+						const objectId = updated.objectId;
+						console.log("ArcGIS feature updated:", objectId);
+
+						// Query the layer again to ensure we get the latest edited values
+						const result = await locationsLayer.queryFeatures({
+							objectIds: [objectId],
+							outFields: ["*"],
+							returnGeometry: false
+						});
+
+						if (result.features.length > 0) {
+							const feature = result.features[0];
+							const attrs = feature.attributes;
+
+							// Send the new data to the backend
+							await this.updateLocationInBackend({
+								name: attrs.name,
+								capacity: attrs.capacity,
+								description: attrs.description ?? null,
+								address: attrs.address,
+								location_type: attrs.location_type,
+								arcgis_feature_id: objectId
+							});
+						}
+					}
+				}
+
 			});
 
 			let selectedLocationOID: number | null = null;

@@ -2,12 +2,13 @@ import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { MapComponent } from './pages/map/map.component';
 import { HomeComponent } from './pages/home/home.component';
-import { ProviderComponent} from './pages/providers/provider.component';
+import { ProviderComponent } from './pages/providers/provider.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { LoginComponent } from './pages/login/login.component';
 import { ReservationComponent } from './pages/reservation/reservation.component';
 import { AuthGuard } from './auth/auth.guard';
 import { ROLES } from './auth/roles';
+import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
 
 export const routes: Routes = [
   {
@@ -42,6 +43,12 @@ export const routes: Routes = [
   {
     path: 'reservation',
     component: ReservationComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [ROLES.CLIENT] }
+  },
+  {
+    path: 'reservation/:id',
+    component: ReservationDetailComponent,
     canActivate: [AuthGuard],
     data: { roles: [ROLES.CLIENT] }
   },

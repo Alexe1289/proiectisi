@@ -1,0 +1,461 @@
+/* --- Main Container --- */
+.detail-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #333;
+
+    /* Top Navigation (Back Button) */
+    .top-nav {
+        margin-bottom: 16px;
+
+        button {
+            color: #0071c2;
+            font-weight: 500;
+        }
+    }
+
+    /* Main Grid Layout */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        /* 2/3 for info, 1/3 for form */
+        gap: 40px;
+
+        @media (max-width: 800px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* =========================================
+     LEFT COLUMN: Property Details
+     ========================================= */
+    .left-column {
+
+        /* Header (Title + Address) */
+        .header-section {
+            margin-bottom: 24px;
+
+            h1 {
+                font-size: 26px;
+                margin: 0 0 8px 0;
+            }
+
+            .sub-header {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                color: #555;
+
+                mat-icon {
+                    font-size: 18px;
+                    width: 18px;
+                    height: 18px;
+                }
+            }
+        }
+
+        /* --- Gallery Section (Carousel) --- */
+        .gallery-section {
+            margin-bottom: 32px;
+            width: 100%;
+
+            /* 1. Main Image Styling */
+            .main-image-container {
+                width: 100%;
+                height: 400px;
+                background: #f0f0f0;
+                border-radius: 12px;
+                overflow: hidden;
+                position: relative;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+                .main-img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: opacity 0.3s ease;
+                }
+
+                /* Navigation Arrows */
+                .nav-btn {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: rgba(255, 255, 255, 0.9);
+                    border: none;
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                    opacity: 0;
+                    /* Hidden by default */
+                    transition: opacity 0.2s, background 0.2s;
+                    z-index: 2;
+
+                    mat-icon {
+                        font-size: 24px;
+                        color: #333;
+                    }
+
+                    &.prev {
+                        left: 16px;
+                    }
+
+                    &.next {
+                        right: 16px;
+                    }
+
+                    &:hover {
+                        background: white;
+                        transform: translateY(-50%) scale(1.1);
+                    }
+                }
+
+                &:hover .nav-btn {
+                    opacity: 1;
+                }
+
+                /* Counter Badge */
+                .image-counter {
+                    position: absolute;
+                    bottom: 16px;
+                    right: 16px;
+                    background: rgba(0, 0, 0, 0.6);
+                    color: white;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    backdrop-filter: blur(4px);
+
+                    mat-icon {
+                        font-size: 16px;
+                        width: 16px;
+                        height: 16px;
+                    }
+                }
+
+                /* Fallback State */
+                .no-image-state {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    color: #999;
+
+                    mat-icon {
+                        font-size: 64px;
+                        width: 64px;
+                        height: 64px;
+                        opacity: 0.5;
+                    }
+                }
+            }
+
+            /* 2. Thumbnails Strip Styling */
+            .thumbnails-track {
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                padding-bottom: 8px;
+                scroll-behavior: smooth;
+
+                &::-webkit-scrollbar {
+                    height: 6px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 3px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: #ccc;
+                    border-radius: 3px;
+                }
+
+                .thumbnail-card {
+                    width: 100px;
+                    height: 70px;
+                    flex-shrink: 0;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    cursor: pointer;
+                    opacity: 0.6;
+                    border: 2px solid transparent;
+                    transition: all 0.2s ease;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+
+                    &:hover {
+                        opacity: 0.8;
+                    }
+
+                    &.active {
+                        opacity: 1;
+                        border-color: #0071c2;
+                        transform: scale(1.05);
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+                    }
+                }
+            }
+        }
+
+        /* Map Section */
+        .map-section {
+            margin-bottom: 32px;
+
+            h3 {
+                font-size: 20px;
+                margin-bottom: 16px;
+                color: #333;
+            }
+
+            .detail-map-view {
+                width: 100%;
+                height: 400px;
+                border-radius: 12px;
+                overflow: hidden;
+                border: 1px solid #ddd;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+                &:focus {
+                    outline: none;
+                }
+            }
+        }
+
+        /* Description & Amenities */
+        .section {
+            margin-bottom: 32px;
+
+            h3 {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            .description-text {
+                line-height: 1.6;
+                color: #444;
+                font-size: 16px;
+            }
+
+            .amenities-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                margin-top: 16px;
+
+                .amenity {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+
+                    mat-icon {
+                        color: #555;
+                    }
+                }
+            }
+        }
+
+        /* Owner Info */
+        .owner-section {
+            .owner-card {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 24px;
+                background: #f9f9f9;
+                border-radius: 12px;
+
+                .avatar-circle {
+                    width: 56px;
+                    height: 56px;
+                    background: #333;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    font-weight: 600;
+                }
+
+                .owner-details {
+                    flex: 1;
+
+                    p {
+                        margin: 4px 0;
+                        font-size: 14px;
+                    }
+
+                    .meta {
+                        color: #777;
+                        font-size: 12px;
+                        margin-top: 4px;
+                    }
+                }
+            }
+        }
+
+        .divider {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 32px 0;
+        }
+    }
+
+    /* =========================================
+     RIGHT COLUMN: Sticky Form
+     ========================================= */
+    .right-column {
+        .offer-card {
+            position: sticky;
+            top: 24px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            background: white;
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                margin-bottom: 24px;
+
+                .price-display {
+                    .currency {
+                        font-weight: 600;
+                        vertical-align: top;
+                    }
+
+                    .amount {
+                        font-size: 22px;
+                        font-weight: 700;
+                        color: #333;
+                    }
+
+                    .unit {
+                        color: #555;
+                    }
+                }
+
+                .status {
+                    color: #008009;
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+            }
+
+            .offer-box {
+                background: #f0f8ff;
+                padding: 16px;
+                border-radius: 8px;
+                border: 1px solid #cce5ff;
+                margin-bottom: 16px;
+
+                h4 {
+                    margin: 0 0 4px;
+                    color: #003580;
+                }
+
+                .hint {
+                    margin: 0 0 12px;
+                    font-size: 12px;
+                    color: #555;
+                }
+            }
+
+            .full-width {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .submit-btn {
+                width: 100%;
+                height: 48px;
+                font-size: 16px;
+                margin-top: 8px;
+                background: #d4111e;
+            }
+
+            .disclaimer {
+                text-align: center;
+                font-size: 12px;
+                color: #777;
+                margin-top: 12px;
+            }
+        }
+    }
+}
+
+/* =========================================
+   DIALOG STYLES (Global Override)
+   ========================================= */
+::ng-deep .custom-success-dialog .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+    border-radius: 16px;
+}
+
+.success-dialog-content {
+    text-align: center;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .success-icon {
+        font-size: 64px;
+        height: 64px;
+        width: 64px;
+        color: #008009;
+        margin-bottom: 16px;
+        animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    h2 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        color: #333;
+    }
+
+    p {
+        color: #666;
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+
+    .done-btn {
+        width: 100%;
+        padding: 8px 0;
+        font-size: 16px;
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
