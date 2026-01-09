@@ -93,6 +93,40 @@ def login():
 
     return jsonify(access_token=access_token)
 
+@app.route("/api/user/me", methods=["PUT"])
+@jwt_required()
+def update_user():
+    user_id, role = get_user()
+    
+    data = request.json or {}
+
+    if role == "client":
+        user = Client.query.get(user_id)
+    elif role == "provider":
+        user = Provider.query.get(user_id)
+    else:
+        return jsonify({"msg": "Invalid role"}), 403
+
+    allowed_fields = {"name", "email", "phone"}
+
+    for field in allowed_fields:
+        if field in data:
+            # check email
+            if field == "email":
+                existing = (
+                    Client.query.filter_by(email=data[field]).first() if role == "client"
+                    else Provider.query.filter_by(email=data[field]).first()
+                )
+                if existing:
+                    if role == "client" and existing.client_id != user_id:
+                        return jsonify({"msg": "Email already in use"}), 409
+                    elif role == "provider" and existing.provider_id != user_id:
+                        return jsonify({"msg": "Email already in use"}), 409
+            setattr(user, field, data[field])
+
+    db.session.commit()
+    return jsonify({"msg": "User updated successfully"})
+
 @app.route("/api/provider/locations", methods=["POST"])
 @jwt_required()
 def add_location():

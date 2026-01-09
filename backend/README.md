@@ -221,7 +221,7 @@ The server listens on `http://localhost:5001`.
 ]
 ```
 
-### 11. GET /api/client/locations/available (JWT required)
+### 12. GET /api/client/locations/available (JWT required)
 - Description: Returns locations but filtered, you can filter by: `capacity` (you insert a minimum value), `location_type`, `datetime` (insert a specific day), `start_datetime` and `end_datetime` (insert day and hour for both ends) (client only).
 - FYI: <B> datetime has priority over interval </B>
 - Example full input:
@@ -234,6 +234,17 @@ start_datetime=2026-01-10T10:00&
 end_datetime=2026-01-10T14:00
 ```
 - Response is identitical with `GET /api/client/locations`
+
+### 13. PUT /api/user/me (JWT required)
+- Description: Used to modify users details: `name`, `email`, `phone`(both client and provider).
+- Full input example:
+```json
+{
+    "name": "Updated Name",
+    "email": "newemail@example.com",
+    "phone": "0712345678"
+}
+```
 ---
 
 > All endpoints marked with JWT require an `Authorization: Bearer <token>` header.
