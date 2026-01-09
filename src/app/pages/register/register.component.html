@@ -1,44 +1,56 @@
-<div class="register">
-  <h2>Create your account</h2>
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header>
+      <mat-card-title>Create your account</mat-card-title>
+      <mat-card-subtitle>Join our platform today</mat-card-subtitle>
+    </mat-card-header>
 
-  <form (ngSubmit)="onSubmit()" #signupForm="ngForm">
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()" #signupForm="ngForm" class="register-form">
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>I am a...</mat-label>
+            <mat-select name="role" [(ngModel)]="role" required>
+              <mat-option value="client">Client</mat-option>
+              <mat-option value="provider">Provider</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-    <!-- Role -->
-    <mat-form-field appearance="fill">
-    <mat-label>Role</mat-label>
-    <mat-select name="role" [(ngModel)]="role" required>
-        <mat-option value="client">Client</mat-option>
-        <mat-option value="provider">Provider</mat-option>
-    </mat-select>
-    </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Full Name</mat-label>
+            <input matInput name="name" [(ngModel)]="name" required placeholder="John Doe">
+          </mat-form-field>
+        </div>
 
-    <!-- Name -->
-    <mat-form-field appearance="fill">
-      <mat-label>Name</mat-label>
-      <input matInput name="name" [(ngModel)]="name" required>
-    </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" name="email" [(ngModel)]="email" required placeholder="email@example.com">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
 
-    <!-- Email -->
-    <mat-form-field appearance="fill">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" name="email" [(ngModel)]="email" required>
-    </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Phone Number</mat-label>
+          <input matInput name="phone" [(ngModel)]="phone" placeholder="+40 7xx xxx xxx">
+          <mat-icon matSuffix>phone</mat-icon>
+        </mat-form-field>
 
-    <!-- Phone -->
-    <mat-form-field appearance="fill">
-      <mat-label>Phone</mat-label>
-      <input matInput name="phone" [(ngModel)]="phone">
-    </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" name="password" [(ngModel)]="password" required>
+          <mat-hint>Min. 6 characters</mat-hint>
+        </mat-form-field>
 
-    <!-- Password -->
-    <mat-form-field appearance="fill">
-      <mat-label>Password</mat-label>
-      <input matInput type="password" name="password" [(ngModel)]="password" required>
-    </mat-form-field>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!signupForm.valid" class="submit-btn">
+          Sign Up
+        </button>
+      </form>
+    </mat-card-content>
 
-    <button mat-raised-button color="primary" type="submit">Sign Up</button>
-  </form>
-
-  <!-- Mesaj succes / eroare -->
-  <p *ngIf="message" [ngClass]="{'success': success, 'error': !success}">{{ message }}</p>
+    <mat-card-footer *ngIf="message">
+      <div [ngClass]="{'status-msg': true, 'success': success, 'error': !success}">
+        {{ message }}
+      </div>
+    </mat-card-footer>
+  </mat-card>
 </div>

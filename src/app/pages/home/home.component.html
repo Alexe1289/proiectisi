@@ -1,16 +1,65 @@
-<div class="title">
-    <h1>      
-        Welcome to <span class = "app-name">BookYourShow</span>
-    </h1>
-<img src = "assets/logo.png" alt = "BookYourShow Logo" width="200"></div>
+<div class="home-container">
 
-<div class="controls" style="margin: 12px 0;">
-    <button mat-raised-button color="warn" (click)="navigateToMap()" *ngIf="authService.isLoggedIn()">View locations!</button>
-    <button mat-raised-button color="warn" (click)="navigateToLogin()" *ngIf="!(authService.isLoggedIn())">Login!</button>
-    <button mat-raised-button color="warn" (click)="navigateToRegister()" *ngIf="!(authService.isLoggedIn())">Register!</button>
-    <button mat-raised-button color="warn" (click)="navigateToProvider()" *ngIf="(authService.getRole()) === 'provider'">Provide!</button>
-    <button mat-raised-button color="warn" (click)="navigateToReservation()" *ngIf="(authService.getRole()) === 'client'">Reserve now!</button>
-    <button mat-raised-button color="warn" (click)="logout()" *ngIf="authService.isLoggedIn()">
-    Logout ({{ currentRole }})
+<div class="title-box">
+  <div class="title">
+    <h1>Welcome to</h1>
+    <img src="assets/logo.png" alt="BookYourShow Logo">
+    <h1>!</h1>
+  </div>
+</div>
+
+  <div class="description-box">
+    <p>
+      <strong>BookYourShow</strong> is a comprehensive platform designed to connect
+      event organizers with venue owners in a simple, efficient, and transparent way.
+    </p>
+
+    <p>
+      Venue owners can easily list their locations, showcase their facilities,
+      set availability, and manage reservations all in one place.
+      Whether it’s a concert hall, conference room, outdoor space, or private venue,
+      owners have full control over how their spaces are presented and booked.
+    </p>
+
+    <p>
+      For event organizers, BookYourShow makes finding the perfect location effortless.
+      Users can explore a wide range of venues, view details, and make reservations
+      quickly and securely.
+    </p>
+
+    <p>
+      Our goal is to simplify event planning by bringing venue providers and clients
+      together on a single, intuitive platform. With BookYourShow, organizing events
+      becomes easier, faster, and more reliable—for everyone involved.
+    </p>
+  </div>
+
+  <div class="controls">
+
+    <button mat-raised-button color="primary"
+            (click)="navigateToLogin()"
+            *ngIf="!authService.isLoggedIn()">
+      Login
     </button>
+
+    <button mat-raised-button color="primary"
+            (click)="navigateToRegister()"
+            *ngIf="!authService.isLoggedIn()">
+      Register
+    </button>
+
+    <button mat-raised-button color="primary"
+            (click)="navigateToProvider()"
+            *ngIf="authService.getRole() === 'provider'">
+      Provide now!
+    </button>
+
+    <button mat-raised-button color="primary"
+            (click)="navigateToReservation()"
+            *ngIf="authService.getRole() === 'client'">
+      Reserve now!
+    </button>
+
+  </div>
+
 </div>

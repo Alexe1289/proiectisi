@@ -18,6 +18,7 @@ import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from "src/environments/environment";
 import { ProviderComponent } from "./pages/providers/provider.component";
 import { RegisterComponent } from './pages/register/register.component';
+import { ProfileComponent } from "./pages/profile/profile.component";
 
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from "./material.module";
@@ -35,6 +36,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ArcgisAuthService } from "./services/arcgis-auth.service";
+import { CalendarComponent } from './shared/calendar/calendar.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -45,7 +50,9 @@ import { ArcgisAuthService } from "./services/arcgis-auth.service";
     RegisterComponent,
     LoginComponent,
     ReservationComponent,
-    ReservationDetailComponent
+    ReservationDetailComponent,
+    CalendarComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -67,7 +74,10 @@ import { ArcgisAuthService } from "./services/arcgis-auth.service";
     MatInputModule,
     ReactiveFormsModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatCardModule,
   ],
   providers: [ArcgisAuthService],
   bootstrap: [AppComponent]

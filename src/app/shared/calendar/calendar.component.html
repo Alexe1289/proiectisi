@@ -1,0 +1,15 @@
+<div class="calendar-grid">
+  <div
+    class="day"
+    *ngFor="let day of availability"
+    [class.available]="day.status === 'available'"
+    [class.pending]="day.status === 'pending'"
+    [class.booked]="day.status === 'booked'"
+    [class.selected]="isSelected(day)"
+    (click)="selectDay(day)"
+  >
+    <div class="weekday">{{ day.date | date:'EEE' }}</div>
+    <div class="day-number">{{ day.date | date:'dd' }}</div>
+    <div class="month">{{ day.date | date:'MMM' }}</div>
+  </div>
+</div>

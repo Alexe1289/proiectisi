@@ -1,20 +1,37 @@
-<div style="padding: 8px; background-color: #eee; margin-bottom: 10px;">
-  <strong>Current role:</strong> {{ role }}
-</div>
+<header class="navbar">
+  <div class="navbar-left" (click)="router.navigate(['/home'])">
+    <img src="assets/logo.png" alt="Logo">
+  </div>
 
-<nav mat-tab-nav-bar [tabPanel]="tabPanel">
-  <ng-container *ngFor="let tab of visibleTabs">
-    <a mat-tab-link
+  <nav class="navbar-center">
+    <a *ngFor="let tab of centerTabs"
        [routerLink]="tab.link"
-       [active]="activeTab === tab.link"
-       (click)="activeTab = tab.link">
+       routerLinkActive="active-link"
+       class="nav-link">
       {{ tab.name }}
     </a>
-  </ng-container>
-</nav>
+  </nav>
 
-<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+  <div class="navbar-right">
+    <div class="auth-group" *ngIf="!isLoggedIn()">
+      <button mat-raised-button color="primary" (click)="router.navigate(['/login'])">Login</button>
+      <button mat-raised-button color="primary" (click)="router.navigate(['/register'])">Register</button>
+    </div>
 
-<div class="container">
-  <router-outlet></router-outlet>
-</div>
+    <div class="auth-group" *ngIf="isLoggedIn()">
+      <button mat-raised-button color="warn" (click)="logoutFromApp()" matTooltip="Logout">Logout</button>
+    </div>
+
+    <div class="role-box" 
+        [class.clickable]="isLoggedIn()" 
+        [style.cursor]="isLoggedIn() ? 'pointer' : 'default'"
+        (click)="isLoggedIn() ? router.navigate(['/profile']) : null" 
+        [matTooltip]="isLoggedIn() ? 'Go to Profile' : ''">
+      {{ currentRole | titlecase }}
+    </div>
+
+  </div>
+  
+</header>
+
+<router-outlet></router-outlet>

@@ -43,7 +43,11 @@ export class AppComponent implements OnInit {
     link: '/reservation',
     roles: [ROLES.CLIENT]
   },
-  ];
+  {
+    name: 'Profile',
+    link: '/profile',
+    roles: [ROLES.CLIENT, ROLES.PROVIDER]
+  }];
 
   activeTab = this.tabs[0].link;
 
@@ -74,11 +78,20 @@ export class AppComponent implements OnInit {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('auth_token');
+    return this.role !== 'guest';
+  }
+
+  logoutFromApp() {
+    this.authService.logout();
+    this.router.navigate(['/home']);
   }
 
   get visibleTabs(): ITab[] {
     return this.tabs.filter(tab => tab.roles.includes(this.role));
+  }
+
+  get centerTabs(): ITab[] {
+    return this.visibleTabs.filter(tab => tab.link !== '/login' && tab.link !== '/register');
   }
 
 }

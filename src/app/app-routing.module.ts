@@ -9,6 +9,8 @@ import { ReservationComponent } from './pages/reservation/reservation.component'
 import { AuthGuard } from './auth/auth.guard';
 import { ROLES } from './auth/roles';
 import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
+import { ProfileComponent } from './pages/profile/profile.component';
+
 
 export const routes: Routes = [
   {
@@ -56,7 +58,13 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
-  }
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [ROLES.CLIENT, ROLES.PROVIDER] }
+  },
 ];
 
 const config: ExtraOptions = {
