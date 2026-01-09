@@ -26,6 +26,16 @@ import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from "./pages/login/login.component";
 import { ReservationComponent } from "./pages/reservation/reservation.component";
 
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ArcgisAuthService } from "./services/arcgis-auth.service";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,6 +45,7 @@ import { ReservationComponent } from "./pages/reservation/reservation.component"
     RegisterComponent,
     LoginComponent,
     ReservationComponent,
+    ReservationDetailComponent
   ],
   imports: [
     BrowserModule,
@@ -49,9 +60,16 @@ import { ReservationComponent } from "./pages/reservation/reservation.component"
     FlexLayoutModule,
     AngularFireModule.initializeApp(environment.firebase, 'AngularDemoFirebase'),
     AngularFireDatabaseModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatDialogModule
   ],
-  providers: [],
+  providers: [ArcgisAuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

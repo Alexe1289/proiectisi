@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { NavigationEnd, Event, Router } from '@angular/router';
 import { ROLES, Role } from './auth/roles';
 import { AuthService } from './auth/auth.service';
+import { ArcgisAuthService } from './services/arcgis-auth.service';
 
 interface ITab {
   name: string;
@@ -15,7 +16,7 @@ interface ITab {
   styleUrls: ['./app.component.scss']
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   tabs: ITab[] = [{
     name: 'Home',
@@ -41,25 +42,30 @@ export class AppComponent {
     name: 'Reservation',
     link: '/reservation',
     roles: [ROLES.CLIENT]
-  }];
+  },
+  ];
 
   activeTab = this.tabs[0].link;
 
   role: string = 'guest';
   currentRole: string = 'guest';
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(private router: Router, private authService: AuthService, private arcgisAuthService: ArcgisAuthService) {
     this.authService.role$.subscribe(role => {
       this.role = role;
       this.currentRole = role;
     });
-    
+
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
         this.activeTab = event.url;
         console.log(event);
       }
     });
+  }
+
+  async ngOnInit() {
+    await this.arcgisAuthService.getValidToken();
   }
 
   // See app.component.html
