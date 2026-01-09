@@ -107,8 +107,16 @@ def add_location():
     address = data.get("address")
     location_type = data.get("location_type")
 
-    if not name or not capacity or not address or not location_type:
+    if not name or not capacity or not address or not location_type or not arcgis_feature_id:
         return jsonify({"msg": "Missing required fields!"}), 400
+    
+    existing_location = Location.query.filter_by(
+        arcgis_feature_id=arcgis_feature_id).first()
+
+    if existing_location:
+        return jsonify({
+            "msg": "A location with this arcgis_feature_id already exists!"
+        }), 409
 
     loc = Location(
         name=name,
@@ -123,17 +131,17 @@ def add_location():
     db.session.add(loc)
     db.session.commit()
 
-    return jsonify({"msg": "Location added", "location_id": loc.location_id})
+    return jsonify({"msg": "Location added"})
 
-@app.route("/api/provider/locations/<int:loc_id>", methods=["PUT"])
+@app.route("/api/provider/locations/<string:arcgis_feature_id>", methods=["PUT"])
 @jwt_required()
-def update_location(loc_id):
+def update_location(arcgis_feature_id):
     user_id, role = get_user()
 
     if role != "provider":
         return jsonify({"msg": "Only providers can update locations!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(arcgis_feature_id=arcgis_feature_id).first()
 
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404
@@ -147,7 +155,7 @@ def update_location(loc_id):
     columns = Location.__table__.columns.keys()
 
     # columns not allowed to be modified
-    forbidden_fields = {"location_id", "provider_id"}
+    forbidden_fields = {"location_id", "provider_id", "arcgis_feature_id"}
 
     for field in columns:
         if field in forbidden_fields:
@@ -157,17 +165,17 @@ def update_location(loc_id):
 
     db.session.commit()
 
-    return jsonify({"msg": "Location updated", "location_id": loc.location_id})
+    return jsonify({"msg": "Location updated"})
 
-@app.route("/api/provider/locations/<int:loc_id>", methods=["DELETE"])
+@app.route("/api/provider/locations/<string:arcgis_feature_id>", methods=["DELETE"])
 @jwt_required()
-def delete_location(loc_id):
+def delete_location(arcgis_feature_id):
     user_id, role = get_user()
 
     if role != "provider":
         return jsonify({"msg": "Only providers can delete locations!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(arcgis_feature_id=arcgis_feature_id).first()
 
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404
@@ -192,7 +200,6 @@ def get_locations_for_clients():
 
     result = [
         {
-            "location_id": loc.location_id,
             "arcgis_feature_id": loc.arcgis_feature_id,
             "name": loc.name
         }
@@ -201,21 +208,20 @@ def get_locations_for_clients():
 
     return jsonify(result)
 
-@app.route("/api/client/locations/<int:loc_id>", methods=["GET"])
+@app.route("/api/client/locations/<string:arcgis_feature_id>", methods=["GET"])
 @jwt_required()
-def get_location_details(loc_id):   
+def get_location_details(arcgis_feature_id):   
     user_id, role = get_user()
 
     if role != "client":
         return jsonify({"msg": "Only clients can view location details!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(arcgis_feature_id=arcgis_feature_id).first()
     
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404
 
     result = {
-        "location_id": loc.location_id,
         "name": loc.name,
         "capacity": loc.capacity,
         "description": loc.description,
@@ -242,7 +248,6 @@ def get_provider_locations():
 
     result = [
         {
-            "location_id": loc.location_id,
             "arcgis_feature_id": loc.arcgis_feature_id,
             "name": loc.name
         }
@@ -251,15 +256,15 @@ def get_provider_locations():
 
     return jsonify(result)
 
-@app.route("/api/client/locations/<int:loc_id>/reservations", methods=["POST"])
+@app.route("/api/client/locations/<string:arcgis_feature_id>/reservations", methods=["POST"])
 @jwt_required()
-def add_reservation(loc_id):
+def add_reservation(arcgis_feature_id):
     user_id, role = get_user()
 
     if role != "client":
         return jsonify({"msg": "Only clients can make reservations!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(arcgis_feature_id=arcgis_feature_id).first()
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404
 
@@ -272,7 +277,7 @@ def add_reservation(loc_id):
 
     reservation = Reservation(
         client_id=user_id,
-        location_id=loc_id,
+        location_id=loc.location_id,
         start_datetime=datetime.fromisoformat(start_datetime),
         end_datetime=datetime.fromisoformat(end_datetime),
         created_at=datetime.utcnow()
@@ -295,7 +300,7 @@ def get_reservations():
             {
                 "reservation_id": r.reservation_id,
                 "location": {
-                    "location_id": r.location.location_id,
+                    "arcgis_feature_id": r.location.arcgis_feature_id,
                     "name": r.location.name
                 },
                 "provider": {
@@ -324,7 +329,7 @@ def get_reservations():
             {
                 "reservation_id": r.reservation_id,
                 "location": {
-                    "location_id": r.location.location_id,
+                    "arcgis_feature_id": r.location.arcgis_feature_id,
                     "name": r.location.name
                 },
                 "client": {
@@ -343,22 +348,22 @@ def get_reservations():
 
     return jsonify({"msg": "Invalid role"}), 403
 
-@app.route("/api/provider/locations/<int:loc_id>/reservations", methods=["GET"])
+@app.route("/api/provider/locations/<string:arcgis_feature_id>/reservations", methods=["GET"])
 @jwt_required()
-def get_reservations_for_location(loc_id):
+def get_reservations_for_location(arcgis_feature_id):
     user_id, role = get_user()
 
     if role != "provider":
         return jsonify({"msg": "Only providers can access this!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(arcgis_feature_id=arcgis_feature_id).first()
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404
 
     if loc.provider_id != user_id:
         return jsonify({"msg": "You can access only your own locations!"}), 403
 
-    reservations = Reservation.query.filter_by(location_id=loc_id).all()
+    reservations = Reservation.query.filter_by(location_id=loc.location_id).all()
 
     result = [
         {

@@ -61,19 +61,19 @@ The server listens on `http://localhost:5001`.
 }
 ```
 - Responses:
-    - 200: `{ "msg": "Location added", "location_id": int }`
-    - 400/403: error message
+    - 200: `{ "msg": "Location added"}`
+    - 400/403/409: error message
 
 
-### 4. PUT /api/provider/locations/<loc_id> (JWT required)
+### 4. PUT /api/provider/locations/<arcgis_feature_id> (JWT required)
 - Description: Update a location (provider only, own locations only).
-- Request body (JSON): any editable location fields (e.g. `name`, `capacity`, `description`, `address`, `location_type`, `arcgis_feature_id`).
+- Request body (JSON): any editable location fields (e.g. `name`, `capacity`, `description`, `address`, `location_type`).
 - Responses:
-    - 200: `{ "msg": "Location updated", "location_id": int }`
+    - 200: `{ "msg": "Location updated"}`
     - 403/404: error message
 
 
-### 5. DELETE /api/provider/locations/<loc_id> (JWT required)
+### 5. DELETE /api/provider/locations/<arcgis_feature_id> (JWT required)
 - Description: Delete a location (provider only, own locations only).
 - Responses:
     - 200: `{ "msg": "Location deleted successfully" }`
@@ -86,12 +86,10 @@ The server listens on `http://localhost:5001`.
 ```json
 [
     {
-        "location_id": 1,
         "arcgis_feature_id": "ABC123",
         "name": "Community Hall"
     },
     {
-        "location_id": 2,
         "arcgis_feature_id": "XYZ789",
         "name": "City Sports Center"
     }
@@ -106,12 +104,10 @@ The server listens on `http://localhost:5001`.
 ```json
 [
     {
-        "location_id": 1,
         "arcgis_feature_id": "ABC123",
         "name": "Community Hall"
     },
     {
-        "location_id": 2,
         "arcgis_feature_id": "XYZ789",
         "name": "City Sports Center"
     }
@@ -120,12 +116,11 @@ The server listens on `http://localhost:5001`.
 - 403: error message
 
 
-### 8. GET /api/client/locations/<loc_id> (JWT required)
+### 8. GET /api/client/locations/<arcgis_feature_id> (JWT required)
 - Description: Return location details (for clients).
 - Example response (200):
 ```json
 {
-    "location_id": 1,
     "name": "Community Hall",
     "capacity": 120,
     "description": "A nice hall for community events.",
@@ -141,7 +136,7 @@ The server listens on `http://localhost:5001`.
 - 403/404: error message
 
 
-### 9. POST /api/client/locations/<loc_id>/reservations (JWT required)
+### 9. POST /api/client/locations/<arcgis_feature_id>/reservations (JWT required)
 - Description: Create a reservation for a location (client only).
 - Request body (JSON):
 ```json
@@ -171,7 +166,7 @@ The server listens on `http://localhost:5001`.
     {
         "reservation_id": 10,
         "location": {
-            "location_id": 1,
+            "arcgis_feature_id": 1,
             "name": "Community Hall"
         },
         "provider": {
@@ -192,7 +187,7 @@ The server listens on `http://localhost:5001`.
     {
         "reservation_id": 11,
         "location": {
-            "location_id": 2,
+            "arcgis_feature_id": 2,
             "name": "City Sports Center"
         },
         "client": {
@@ -207,7 +202,7 @@ The server listens on `http://localhost:5001`.
 ]
 ```
 
-### 11. GET /api/provider/locations/<loc_id>/reservations (JWT required)
+### 11. GET /api/provider/locations/<arcgis_feature_id>/reservations (JWT required)
 - Description: List reservations for a specific location (provider only, own locations only).
 - Example response (200):
 ```json
