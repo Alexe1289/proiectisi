@@ -133,7 +133,9 @@ def update_location(loc_id):
     if role != "provider":
         return jsonify({"msg": "Only providers can update locations!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(
+        arcgis_feature_id=loc_id
+    ).first()
 
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404
@@ -167,7 +169,9 @@ def delete_location(loc_id):
     if role != "provider":
         return jsonify({"msg": "Only providers can delete locations!"}), 403
 
-    loc = Location.query.get(loc_id)
+    loc = Location.query.filter_by(
+        arcgis_feature_id=loc_id
+    ).first()
 
     if not loc:
         return jsonify({"msg": "Location not found!"}), 404

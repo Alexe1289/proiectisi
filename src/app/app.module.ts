@@ -35,6 +35,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ArcgisAuthService } from "./services/arcgis-auth.service";
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -67,7 +69,9 @@ import { ArcgisAuthService } from "./services/arcgis-auth.service";
     MatInputModule,
     ReactiveFormsModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule
   ],
   providers: [ArcgisAuthService],
   bootstrap: [AppComponent]
