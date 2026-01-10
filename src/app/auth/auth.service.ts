@@ -21,8 +21,23 @@ export class AuthService {
     return !(this.getRole()=='guest');
   }
 
+  /* Current user */
+  private currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('user_data') || 'null'));
+
+  constructor() { }
+
+  setUser(user: any): void {
+    localStorage.setItem('user_data', JSON.stringify(user));
+    this.currentUserSubject.next(user);
+  }
+
+  getUser() {
+    return this.currentUserSubject.asObservable();
+  }
+
   logout() {
     this.setRole('guest');
+    this.setUser(null);
     localStorage.removeItem('token');
   }
 }

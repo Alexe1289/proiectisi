@@ -51,11 +51,12 @@ export class AppComponent {
 
   role: string = 'guest';
   currentRole: string = 'guest';
+  currentUser: any = null;
 
   constructor(public router: Router, private authService: AuthService) {
-    this.authService.role$.subscribe(role => {
-      this.role = role;
-      this.currentRole = role;
+this.authService.getUser().subscribe(user => {
+      this.currentUser = user;
+      this.role = user ? user.role : 'guest';
     });
     
     this.router.events.subscribe((event: Event) => {
