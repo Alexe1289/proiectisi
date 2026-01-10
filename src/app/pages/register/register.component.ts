@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -16,7 +17,7 @@ export class RegisterComponent implements OnInit {
   message = '';
   success = false;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   
   ngOnInit(): void {
@@ -34,12 +35,21 @@ export class RegisterComponent implements OnInit {
     this.http.post("http://localhost:5001/api/register", payload).
       subscribe({
         next: (res: any) => {
-          this.message = 'Account created successfully';
+          this.message = 'Account created successfully! Redirecting to Login...';
           this.success = true;
+
+          setTimeout(() => {
+            this.message = '';
+            this.router.navigate(['/login']);
+          }, 3000);
         },
         error: (err) => {
           this.message = err.error.error || 'Signup failed';
           this.success = false;
+
+          setTimeout(() => {
+            this.message = '';
+          }, 3000);
         }
       });
   }

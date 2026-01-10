@@ -91,7 +91,14 @@ def login():
         expires_delta=False
     )
 
-    return jsonify(access_token=access_token)
+    user_data = {
+        "name": user.name,
+        "email": user.email,
+        "phone": user.phone,
+        "role": role
+    }
+
+    return jsonify(access_token=access_token, user=user_data)
 
 @app.route("/api/user/me", methods=["PUT"])
 @jwt_required()
@@ -126,6 +133,33 @@ def update_user():
 
     db.session.commit()
     return jsonify({"msg": "User updated successfully"})
+
+@app.route("/api/profile/change-password", methods=["PUT"])
+@jwt_required()
+def change_password():
+    user_id, role = get_user()
+    data = request.json or {}
+    
+    current_password = data.get("currentPassword")
+    new_password = data.get("newPassword")
+
+    if not current_password or not new_password:
+        return jsonify({"msg": "Missing password fields"}), 400
+
+    if role == "client":
+        user = Client.query.get(user_id)
+    else:
+        user = Provider.query.get(user_id)
+
+    if not bcrypt.checkpw(current_password.encode("utf-8"), user.password_hash):
+        return jsonify({"msg": "Current password is incorrect"}), 401
+
+    new_password_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+    user.password_hash = new_password_hash
+    
+    db.session.commit()
+
+    return jsonify({"msg": "Password updated successfully"}), 200
 
 @app.route("/api/provider/locations", methods=["POST"])
 @jwt_required()

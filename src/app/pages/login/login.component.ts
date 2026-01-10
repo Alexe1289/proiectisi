@@ -29,15 +29,18 @@ export class LoginComponent {
         next: (res: any) => {
           const token = res.access_token;
           localStorage.setItem('auth_token', token);
+          this.authService.setUser(res.user);
 
           const role = getRoleFromToken(token);
           localStorage.setItem('user_role', role);
           this.currentRole = role;
           this.authService.setRole(role);
 
-          this.message = 'Login successful';
+          this.message = 'Login successful! Redirecting...';
           this.success = true;
-          this.router.navigate(['/home']);
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 3000);
         },
         error: (err) => {
           console.error('Login error:', err);
@@ -46,9 +49,13 @@ export class LoginComponent {
           } else if (err.error?.message) {
             this.message = err.error.message;
           } else {
-            this.message = 'Login failed';
+            this.message = 'Login failed!';
           }
           this.success = false;
+
+          setTimeout(() => {
+            this.message = '';
+          }, 3000);
         }
       });
   }

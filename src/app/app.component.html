@@ -27,7 +27,9 @@
         [style.cursor]="isLoggedIn() ? 'pointer' : 'default'"
         (click)="isLoggedIn() ? router.navigate(['/profile']) : null" 
         [matTooltip]="isLoggedIn() ? 'Go to Profile' : ''">
-      {{ currentRole | titlecase }}
+      
+      {{ isLoggedIn() ? currentUser?.name : 'Guest' }}
+
     </div>
 
   </div>

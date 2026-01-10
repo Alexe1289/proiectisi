@@ -24,7 +24,10 @@
         <div class="info-row">
           <label>Email Address</label>
           <div class="value-container">
-            <span class="readonly-text">{{ userData.email }}</span>
+            <span *ngIf="!isEditMode">{{ userData.email }}</span>
+            <mat-form-field *ngIf="isEditMode" appearance="outline">
+              <input matInput [(ngModel)]="userData.email" name="name">
+            </mat-form-field>
           </div>
         </div>
 
@@ -77,7 +80,7 @@
       </div>
 
       <div class="actions">
-        <button mat-raised-button color="primary" *ngIf="!isEditMode" (click)="isEditMode = true">
+        <button mat-raised-button color="primary" *ngIf="!isEditMode" (click)="toggleEdit()">
           <mat-icon>edit</mat-icon> Edit Profile
         </button>
 
@@ -85,7 +88,7 @@
           <mat-icon>save</mat-icon> Save Changes
         </button>
 
-        <button mat-button *ngIf="isEditMode" (click)="isEditMode = false">
+        <button mat-button *ngIf="isEditMode" (click)="cancelEdit()">
           Cancel
         </button>
       </div>

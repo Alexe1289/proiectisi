@@ -53,11 +53,12 @@ export class AppComponent implements OnInit {
 
   role: string = 'guest';
   currentRole: string = 'guest';
+  currentUser: any = null;
 
-  constructor(private router: Router, private authService: AuthService, private arcgisAuthService: ArcgisAuthService) {
-    this.authService.role$.subscribe(role => {
-      this.role = role;
-      this.currentRole = role;
+  constructor(public router: Router, private authService: AuthService) {
+      this.authService.getUser().subscribe(user => {
+      this.currentUser = user;
+      this.role = user ? user.role : 'guest';
     });
 
     this.router.events.subscribe((event: Event) => {
