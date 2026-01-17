@@ -78,6 +78,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatCheckboxModule,
     MatDatepickerModule,
     MatCardModule,
+    MatTooltipModule
   ],
   providers: [ArcgisAuthService],
   bootstrap: [AppComponent]

@@ -40,7 +40,7 @@ export class LoginComponent {
           this.success = true;
           setTimeout(() => {
             this.router.navigate(['/home']);
-          }, 3000);
+          }, 1000);
         },
         error: (err) => {
           console.error('Login error:', err);
