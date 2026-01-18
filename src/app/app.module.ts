@@ -40,8 +40,6 @@ import { CalendarComponent } from './shared/calendar/calendar.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -77,8 +75,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     ReactiveFormsModule,
     MatIconModule,
     MatDialogModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
     MatCheckboxModule,
     MatDatepickerModule,
     MatCardModule,

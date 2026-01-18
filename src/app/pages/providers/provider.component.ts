@@ -16,9 +16,6 @@ import IdentityManager from "@arcgis/core/identity/IdentityManager";
 import { element } from 'protractor';
 import FeatureFilter from '@arcgis/core/layers/support/FeatureFilter.js';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import BasemapToggle from '@arcgis/core/widgets/BasemapToggle.js';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
 @Component({
 	selector: 'provider',
@@ -43,45 +40,10 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 	private allowedLocationIds: number[] = [];
 	private isUpdatingParking = false;
 	private token = localStorage.getItem('auth_token');
-	selectedLocationName: string | null = null; // New property for UI
-	selectedLocationOID: number | null = null;
-	isSaving = false; // New property for loading spinner
 
 
-	constructor(private http: HttpClient,
-		private snackBar: MatSnackBar
-	) { }
+	constructor(private http: HttpClient) { }
 
-	async deleteCascade(layer: FeatureLayer, parentId: number, layerName: string) {
-		try {
-			// 1. Find all features belonging to this parent ID
-			const result = await layer.queryFeatures({
-				where: `location_id = ${parentId}`,
-				returnGeometry: false,
-				outFields: ["OBJECTID"] // We only need the ID to delete
-			});
-
-			if (result.features.length > 0) {
-				console.log(`Cascade deleting ${result.features.length} items from ${layerName}...`);
-
-				// 2. Delete them
-				await layer.applyEdits({
-					deleteFeatures: result.features
-				});
-
-				this.showMessage(`Location successfully deleted!`);
-			}
-		} catch (error) {
-			console.error(`Error deleting from ${layerName}:`, error);
-		}
-	}
-
-	private showMessage(msg: string, isError = false) {
-		this.snackBar.open(msg, 'Close', {
-			duration: 3000,
-			panelClass: isError ? 'error-snackbar' : 'success-snackbar'
-		});
-	}
 	async fetchAllowedLocationIds(): Promise<number[]> {
 
 		const headers = new HttpHeaders({
@@ -131,7 +93,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 			payload,
 			{ headers }
 		).toPromise();
-		this.showMessage(`Location successfully updated!`);
+
 		console.log("Location updated in backend:", payload);
 	}
 
@@ -154,7 +116,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 			{ headers }
 		).toPromise();
 
-		this.showMessage(`Location successfully created!`);
 		console.log("Location sent to backend:", payload);
 	}
 
@@ -293,9 +254,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						location_type: attrs.location_type,
 						arcgis_feature_id: objectId
 					});
-					this.selectedLocationName = attrs.name || "Unnamed Location";
-					this.selectedLocationOID = objectId;
-
 				}
 				if (event.deletedFeatures && event.deletedFeatures.length > 0) {
 					console.log("Processing deleted features...");
@@ -314,9 +272,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						}
 
 						// 3. Notify Backend
-
 						await this.deleteLocationFromBackend(objectId);
-						await this.deleteCascade(parkingLayer, objectId, "parking locations");
 					}
 				}
 				if (event.updatedFeatures && event.updatedFeatures.length > 0) {
@@ -350,27 +306,11 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 			});
 
-			reactiveUtils.watch(
-				() => editor.activeWorkflow,
-				(workflow) => {
-					// Case A: User selected a feature (Entered "Update" mode)
-					if (workflow && workflow.type === "update") {
-						console.log("Editor workflow started for update:", workflow);
-						// The 'editableItem' contains the feature being edited
-						const editableItem = (workflow as any).editableItem;
-						const feature = editableItem?.feature;
+			let selectedLocationOID: number | null = null;
 
-						if (feature && feature.layer === locationsLayer) {
-							console.log("Editing feature:", feature);
-							this.selectedLocationOID = feature.attributes.OBJECTID;
-							this.selectedLocationName = feature.attributes.name || "Unnamed Location";
-						}
-					}
-					// Case B: User cleared selection or finished editing
-				}
-			);
 			this.view.on("click", async (event) => {
 				const hit = await this.view!.hitTest(event);
+
 				const result = hit.results.find((r) =>
 					r.type === "graphic" && (r as any).graphic.layer === locationsLayer
 				);
@@ -378,11 +318,10 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 				if (!result) return;
 
 				const graphic = (result as any).graphic;
-				this.selectedLocationOID = graphic.attributes.OBJECTID;
-				console.log("Selected Location OID:", this.selectedLocationOID);
+				selectedLocationOID = graphic.attributes.OBJECTID;
+				console.log("Selected Location OID:", selectedLocationOID);
 
 				console.log("Clicked feature:", graphic);
-				this.selectedLocationName = graphic.attributes.name || "Unnamed Location";
 
 				this.view!.goTo({
 					target: graphic.geometry,
@@ -390,19 +329,12 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 				});
 				parkingLayer.featureEffect = {
 					filter: new FeatureFilter({
-						where: `location_id = ${this.selectedLocationOID}`
+						where: `location_id = ${selectedLocationOID}`
 					}),
 					includedEffect: "opacity(100%)",
 					excludedEffect: "opacity(0%)"  // hide excluded features
 				} as any;
 			});
-
-			const toggle = new BasemapToggle({
-				view: this.view,
-				nextBasemap: "arcgis-imagery" // Allows switching to Satellite view
-			});
-
-			this.view.ui.add(toggle, "bottom-right");
 
 			parkingLayer.on("edits", async (event) => {
 				if (this.isUpdatingParking) return;
@@ -411,26 +343,18 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 				const added = event.addedFeatures[0];
 				const objectId = added.objectId;
 				console.log("New parking feature added:", added);
-				this.showMessage('Saving new location...');
 				const result = await parkingLayer.queryFeatures({
 					objectIds: [objectId],
 					outFields: ["*"],
 					returnGeometry: true
 				});
 				const feature = result.features[0];
-				feature.attributes.location_id = this.selectedLocationOID;
+				feature.attributes.location_id = selectedLocationOID;
 				this.isUpdatingParking = true;
 				console.log("Updating parking feature with location_id:", feature.attributes.location_id);
 				await parkingLayer.applyEdits({
 					updateFeatures: [feature]
 				});
-				parkingLayer.featureEffect = {
-					filter: new FeatureFilter({
-						where: `location_id = ${this.selectedLocationOID}`
-					}),
-					includedEffect: "opacity(100%)",
-					excludedEffect: "opacity(0%)"  // hide excluded features
-				} as any;
 				this.isUpdatingParking = false;
 
 			});
