@@ -1,15 +1,29 @@
 <div class="editor-layout">
   <div class="sidebar">
     <h2>Event Location Editor</h2>
-    <p>
-      Click the <strong>Edit</strong> button in the map panel to:
-    </p>
-    <ul>
-      <li>Add a new event location on the map</li>
-      <li>Edit attributes (name, capacity, type, etc.)</li>
-      <li>Move / delete existing locations (if allowed)</li>
-    </ul>
 
+    <div class="status-card" [class.active]="selectedLocationName">
+      <small>Currently Editing:</small>
+      <div class="location-name">
+        {{ selectedLocationName || 'No Location Selected' }}
+      </div>
+      <p class="hint" *ngIf="!selectedLocationName">
+        <mat-icon inline>info</mat-icon> Click a blue pin on the map to add parking to it.
+      </p>
+    </div>
+
+    <div class="instructions">
+      <h3>Instructions</h3>
+      <ul>
+        <li><strong>Add:</strong> Click the "Add Feature" tool in the map.</li>
+        <li><strong>Edit:</strong> Click any existing pin.</li>
+        <li><strong>Satellite:</strong> Use the toggle bottom-right for precision.</li>
+      </ul>
+    </div>
+
+    <div *ngIf="isSaving" class="saving-indicator">
+      <mat-spinner diameter="20"></mat-spinner> Saving changes...
+    </div>
   </div>
 
   <div class="map-container">

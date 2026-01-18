@@ -43,6 +43,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MyBookingsDetailsComponent } from "./pages/my-bookings/my-bookings-details.component";
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -84,7 +86,10 @@ import { MyBookingsDetailsComponent } from "./pages/my-bookings/my-bookings-deta
     MatCheckboxModule,
     MatDatepickerModule,
     MatCardModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
   ],
   providers: [ArcgisAuthService],
   bootstrap: [AppComponent]
