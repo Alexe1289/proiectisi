@@ -10,6 +10,8 @@ import { AuthGuard } from './auth/auth.guard';
 import { ROLES } from './auth/roles';
 import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { ManageOffersComponent } from './pages/manage-offers/manage-offers.component';
+import { MyBookingsComponent } from './pages/my-bookings/my-bookings.component';
 
 
 export const routes: Routes = [
@@ -51,6 +53,18 @@ export const routes: Routes = [
   {
     path: 'reservation/:id',
     component: ReservationDetailComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [ROLES.CLIENT] }
+  },
+  {
+    path: 'manage-offers',
+    component: ManageOffersComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [ROLES.PROVIDER] }
+  },
+  {
+    path: 'my-bookings',
+    component: MyBookingsComponent,
     canActivate: [AuthGuard],
     data: { roles: [ROLES.CLIENT] }
   },

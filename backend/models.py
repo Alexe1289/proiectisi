@@ -44,9 +44,15 @@ class Reservation(db.Model):
     reservation_id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('clients.client_id'), nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'), nullable=False)
+
     start_datetime = db.Column(db.DateTime, nullable=False)
     end_datetime = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
 
     client = db.relationship('Client', backref=db.backref('reservations', lazy=True))
     location = db.relationship('Location', backref=db.backref('reservations', lazy=True))
+
+    price_offer = db.Column(db.Float, nullable=True)
+    guest_count = db.Column(db.Integer, nullable=True)
+
+    status = db.Column(db.String(20), nullable=False, default='pending')
