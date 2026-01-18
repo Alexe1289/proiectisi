@@ -26,6 +26,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from "./pages/login/login.component";
 import { ReservationComponent } from "./pages/reservation/reservation.component";
+import { ManageOffersComponent } from "./pages/manage-offers/manage-offers.component";
+import { MyBookingsComponent } from "./pages/my-bookings/my-bookings.component";
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -40,6 +42,7 @@ import { CalendarComponent } from './shared/calendar/calendar.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MyBookingsDetailsComponent } from "./pages/my-bookings/my-bookings-details.component";
 
 @NgModule({
   declarations: [
@@ -53,6 +56,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ReservationDetailComponent,
     CalendarComponent,
     ProfileComponent,
+    ManageOffersComponent,
+    MyBookingsComponent,
+    MyBookingsDetailsComponent
   ],
   imports: [
     BrowserModule,

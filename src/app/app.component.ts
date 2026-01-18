@@ -43,6 +43,14 @@ export class AppComponent implements OnInit {
     link: '/reservation',
     roles: [ROLES.CLIENT]
   }, {
+    name: 'Manage Offers',
+    link: '/manage-offers',
+    roles: [ROLES.PROVIDER]
+  }, {
+    name: 'My bookings',
+    link: '/my-bookings',
+    roles: [ROLES.CLIENT]
+  }, {
     name: 'Profile',
     link: '/profile',
     roles: [ROLES.CLIENT, ROLES.PROVIDER]
