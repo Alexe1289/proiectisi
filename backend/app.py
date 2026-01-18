@@ -416,6 +416,9 @@ def add_reservation(arcgis_feature_id):
         location_id=loc.location_id,
         start_datetime=datetime.fromisoformat(start_datetime),
         end_datetime=datetime.fromisoformat(end_datetime),
+        price_offer=data.get("price_offer"),
+        guest_count=data.get("guest_count"),
+        status='pending',
         created_at=datetime.utcnow()
     )
 
@@ -423,6 +426,66 @@ def add_reservation(arcgis_feature_id):
     db.session.commit()
 
     return jsonify({"msg": "Reservation created", "reservation_id": reservation.reservation_id})
+
+@app.route("/api/reservations/<int:reservation_id>", methods=["PUT"])
+@jwt_required()
+def update_reservation_details(reservation_id):
+    user_id, role = get_user()
+    
+    reservation = Reservation.query.get(reservation_id)
+    if not reservation:
+        return jsonify({"msg": "Reservation not found!"}), 404
+
+    data = request.json
+
+    # Modify details as cliect
+    if role == "client":
+        if reservation.client_id != user_id:
+            return jsonify({"msg": "You can only edit your own reservations!"}), 403
+        
+        if reservation.status != 'pending':
+            return jsonify({"msg": "Cannot edit a reservation that is already accepted or rejected!"}), 400
+
+        if "start_datetime" in data:
+            reservation.start_datetime = datetime.fromisoformat(data["start_datetime"].replace("Z", "+00:00"))
+        if "end_datetime" in data:
+            reservation.end_datetime = datetime.fromisoformat(data["end_datetime"].replace("Z", "+00:00"))
+        if "price_offer" in data:
+            reservation.price_offer = data["price_offer"]
+        if "guest_count" in data:
+            reservation.guest_count = data["guest_count"]
+
+    # Accept/reject offer
+    elif role == "provider":
+        if reservation.location.provider_id != user_id:
+            return jsonify({"msg": "Access denied!"}), 403
+        
+        if "status" in data:
+            reservation.status = data["status"]
+
+    else:
+        return jsonify({"msg": "Invalid role"}), 403
+
+    db.session.commit()
+    return jsonify({"msg": "Reservation updated successfully", "reservation_id": reservation_id})
+
+@app.route("/api/reservations/<int:reservation_id>/delete", methods=["DELETE"])
+@jwt_required()
+def delete_reservation(reservation_id):
+    user_id, role = get_user()
+
+    reservation = Reservation.query.get(reservation_id)
+    
+    if not reservation:
+        return jsonify({"msg": "Reservation not found"}), 404
+
+    if role != "client" or reservation.client_id != user_id:
+        return jsonify({"msg": "Unauthorized. You can only delete your own requests."}), 403
+
+    db.session.delete(reservation)
+    db.session.commit()
+    
+    return jsonify({"msg": "Reservation deleted successfully"})
 
 @app.route("/api/reservations", methods=["GET"])
 @jwt_required()
@@ -435,6 +498,9 @@ def get_reservations():
         result = [
             {
                 "reservation_id": r.reservation_id,
+                "status": r.status,
+                "price_offer": r.price_offer,
+                "guest_count": r.guest_count,
                 "location": {
                     "arcgis_feature_id": r.location.arcgis_feature_id,
                     "name": r.location.name
@@ -473,6 +539,9 @@ def get_reservations():
                     "name": r.client.name,
                     "email": r.client.email
                 },
+                "status": r.status,
+                "price_offer": r.price_offer,
+                "guest_count": r.guest_count,      
                 "start_datetime": r.start_datetime.isoformat(),
                 "end_datetime": r.end_datetime.isoformat(),
                 "created_at": r.created_at.isoformat()
@@ -509,6 +578,9 @@ def get_reservations_for_location(arcgis_feature_id):
                 "name": r.client.name,
                 "email": r.client.email
             },
+            "status": r.status,
+            "price_offer": r.price_offer,
+            "guest_count": r.guest_count,
             "start_datetime": r.start_datetime.isoformat(),
             "end_datetime": r.end_datetime.isoformat(),
             "created_at": r.created_at.isoformat()

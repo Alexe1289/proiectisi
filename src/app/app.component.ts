@@ -42,8 +42,15 @@ export class AppComponent implements OnInit {
     name: 'Reservation',
     link: '/reservation',
     roles: [ROLES.CLIENT]
-  },
-  {
+  }, {
+    name: 'Manage Offers',
+    link: '/manage-offers',
+    roles: [ROLES.PROVIDER]
+  }, {
+    name: 'My bookings',
+    link: '/my-bookings',
+    roles: [ROLES.CLIENT]
+  }, {
     name: 'Profile',
     link: '/profile',
     roles: [ROLES.CLIENT, ROLES.PROVIDER]
@@ -55,7 +62,7 @@ export class AppComponent implements OnInit {
   currentRole: string = 'guest';
   currentUser: any = null;
 
-  constructor(public router: Router, private authService: AuthService) {
+  constructor(public router: Router, private authService: AuthService, private arcgisAuthService: ArcgisAuthService) {
       this.authService.getUser().subscribe(user => {
       this.currentUser = user;
       this.role = user ? user.role : 'guest';
