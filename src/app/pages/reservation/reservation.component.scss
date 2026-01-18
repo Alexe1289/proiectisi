@@ -17,12 +17,10 @@
     }
   }
 
-  /* --- Search Bar --- */
   .search-bar {
     display: flex;
     gap: 8px;
     background: #feb025;
-    /* Booking.com yellow-ish accent or keep white */
     background: white;
     padding: 6px;
     border-radius: 4px;
@@ -31,12 +29,10 @@
     margin: 0 auto 24px;
     align-items: center;
     border: 3px solid #ffb700;
-    /* mimic booking border */
 
     mat-form-field {
       flex: 1;
       margin-bottom: -1.25em;
-      /* Fix mat-form-field spacing quirk */
     }
 
     .search-btn {
@@ -47,7 +43,6 @@
     }
   }
 
-  /* --- Booking Style Card --- */
   .results-container {
     max-width: 1100px;
     margin: 0 auto;
@@ -75,7 +70,6 @@
       flex-direction: column;
     }
 
-    /* 1. Left: Image */
     .card-image-wrapper {
       width: 240px;
       height: 200px;
@@ -175,7 +169,6 @@
       }
     }
 
-    /* 2. Middle: Info */
     .card-details {
       flex: 1;
       display: flex;
@@ -189,7 +182,6 @@
         h3 {
           margin: 0;
           color: #0071c2;
-          /* Booking blue */
           font-size: 20px;
           font-weight: 700;
           cursor: pointer;
@@ -260,7 +252,6 @@
       }
     }
 
-    /* 3. Right: Pricing */
     .card-pricing {
       width: 160px;
       display: flex;
@@ -343,10 +334,6 @@
     }
   }
 
-  /* --- Map Container (Existing logic kept, styled slightly better) --- */
-  /* ... (Keep existing list styles) ... */
-
-  /* --- Map Container Styles --- */
   .map-container {
     width: 100%;
     height: 400px;
@@ -383,16 +370,12 @@
       }
     }
 
-    /* --- Bottom Left Popup Panel --- */
     .side-panel {
       position: absolute;
-      /* Bottom Left Positioning */
       bottom: 24px;
       left: 24px;
       top: auto;
-      /* Reset top */
       transform: none;
-      /* Reset center transform if it existed */
 
       width: 340px;
       background: white;
@@ -402,7 +385,6 @@
       overflow: hidden;
       animation: slideUp 0.3s ease-out;
 
-      /* 1. Carousel Header */
       .panel-image-wrapper {
         height: 200px;
         position: relative;
@@ -505,7 +487,6 @@
         }
       }
 
-      /* 2. Content Body */
       .panel-content {
         padding: 16px;
 

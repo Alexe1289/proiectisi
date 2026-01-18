@@ -35,10 +35,9 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
   searchResults: LocationResult[] = [];
   showMap = false;
 
-  // --- Map Popup State ---
   selectedLocation: any = null;
-  selectedLocationImages: string[] = []; // Array for map carousel
-  selectedImageIndex: number = 0;        // Index for map carousel
+  selectedLocationImages: string[] = [];
+  selectedImageIndex: number = 0;
 
 
   private readonly apiKey = 'AAPTxy8BH1VEsoebNVZXo8HurJWqcGsDXcgXORUKOHbx4SEyKajspwDLD_FV7kULXZy8YJalSsjCnjmJmmdMu_sovrAGh6NI6FVe1YzcpE8q9yLdbS7A8OwUYSqOGHxv4CA9lFsAB0P01OVZ0CsH9MNqZ-AEFs4cedGv8iHP93cLVe8J1mRIAhmzxNt6ZBLPsIAaffldLkParSywYEK8DqrMRH1f1fuLYkApbnPEKjhL55Y.AT1_Ji8b2dCj';
@@ -53,18 +52,15 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Restore previous search state if available
     const savedResults = this.searchStateService.searchResults;
     if (savedResults && savedResults.length > 0) {
       this.searchResults = savedResults;
       this.showMap = this.searchStateService.showMap;
 
-      // Restore the form values (dates, query)
       if (this.searchStateService.searchFormValue) {
         this.reservationForm.patchValue(this.searchStateService.searchFormValue);
       }
 
-      // If map was open, we need to re-initialize it
       if (this.showMap) {
         setTimeout(() => this.initMap(), 0);
       }
@@ -86,7 +82,7 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
         this.searchStateService.setSearchState(
           this.searchResults,
           this.reservationForm.value,
-          false // Map is closed by default on new search
+          false
         );
         await Promise.all(this.searchResults.map(loc => this.hydrateLocationWithImages(loc)));
       },
@@ -94,7 +90,6 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // --- List Carousel Logic ---
   async hydrateLocationWithImages(location: LocationResult) {
     const objectId = location.arcgis_feature_id;
     if (!objectId) { location.loadingImages = false; return; }
@@ -129,8 +124,6 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
       loc.currentImageIndex = (loc.currentImageIndex! - 1 + loc.imageUrls.length) % loc.imageUrls.length;
     }
   }
-
-  // --- Map & Popup Logic ---
 
   toggleMap() {
     this.showMap = !this.showMap;
@@ -168,7 +161,7 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
     });
     const toggle = new BasemapToggle({
       view: this.mapView,
-      nextBasemap: "arcgis-imagery" // The basemap to switch to when clicked
+      nextBasemap: "arcgis-imagery"
     });
     this.mapView.ui.add(toggle, "bottom-right");
 
@@ -183,12 +176,10 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
 
       this.zone.run(() => {
         this.selectedLocation = graphic.attributes;
-        // Reset and load images for the popup
         this.selectedLocationImages = [];
         this.selectedImageIndex = 0;
       });
 
-      // Load all attachments for the map popup
       await this.loadMapAttachments(oid);
 
       this.mapView.goTo({ target: graphic.geometry, zoom: 17 });
@@ -214,7 +205,6 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // --- Popup Carousel Controls ---
   nextMapImage() {
     if (this.selectedLocationImages.length > 1) {
       this.selectedImageIndex = (this.selectedImageIndex + 1) % this.selectedLocationImages.length;

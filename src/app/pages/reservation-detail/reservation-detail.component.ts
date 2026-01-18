@@ -2,11 +2,10 @@ import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, OnDestroy, Tem
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http'; // <--- 1. Import HTTP
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
 
-// ArcGIS Imports
 import esriConfig from '@arcgis/core/config.js';
 import Map from '@arcgis/core/Map.js';
 import MapView from '@arcgis/core/views/MapView.js';
@@ -26,11 +25,10 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
     propertyId: string | null = null;
     mapView: MapView | null = null;
 
-    // Initial Placeholder Data (Will be overwritten by real data)
     property: any = {
         name: 'Loading...',
         address: '',
-        pricePerDay: 450, // Default/Placeholder since backend might not have it yet
+        pricePerDay: 450,
         capacity: 0,
         location_type: '',
         description: 'A stunning venue perfect for large events, conferences, and weddings. Located in the heart of the city.',
@@ -41,10 +39,9 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
             responseRate: '98%',
             joined: '2019'
         },
-        images: [] // Starts empty
+        images: []
     };
 
-    // UI State
     currentImageIndex = 0;
 
     constructor(
@@ -53,7 +50,7 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
-        private http: HttpClient // <--- Inject HttpClient
+        private http: HttpClient
     ) {
         this.offerForm = this.fb.group({
             priceOffer: ['', Validators.required],
@@ -69,17 +66,13 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
     ngOnInit(): void {
         this.propertyId = this.route.snapshot.paramMap.get('id');
 
-        // Set default price
         this.offerForm.patchValue({ priceOffer: this.property.pricePerDay });
 
-        // Fetch Real Data
         if (this.propertyId) {
             this.fetchLocationDetails(this.propertyId);
         }
     }
 
-    // --- 1. Fetch Data from Backend ---
-    // --- 1. Fetch Single Location from Backend ---
     fetchLocationDetails(id: string) {
         const token = localStorage.getItem('auth_token');
         if (!token) return;
@@ -98,7 +91,6 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
                     this.property.provider = location.provider;
                     this.property.description = location.description;
 
-                    // Now fetch the images for this specific location
                     this.loadLocationImages(id);
                 }
             },
@@ -106,7 +98,6 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
         });
     }
 
-    // --- 2. Fetch Images from ArcGIS ---
     async loadLocationImages(id: string) {
         try {
             const listUrl = `${environment.arcgis.featureLayerUrl}/${id}/attachments?f=json&token=${environment.arcgis.token}`;
@@ -114,12 +105,10 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
             const json = await res.json();
 
             if (json.attachmentInfos && json.attachmentInfos.length > 0) {
-                // Map the results to full URLs
                 this.property.images = json.attachmentInfos.map((att: any) =>
                     `${environment.arcgis.featureLayerUrl}/${id}/attachments/${att.id}?token=${environment.arcgis.token}`
                 );
             } else {
-                // Fallback if no images found
                 this.property.images = [];
             }
         } catch (error) {
@@ -127,7 +116,6 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
         }
     }
 
-    // --- Image Navigation ---
     nextImage() {
         if (this.property.images.length > 1) {
             this.currentImageIndex = (this.currentImageIndex + 1) % this.property.images.length;
@@ -140,7 +128,6 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
         }
     }
 
-    // --- Map Logic ---
     ngAfterViewInit(): void {
         if (this.propertyId) {
             this.initDetailMap(this.propertyId);

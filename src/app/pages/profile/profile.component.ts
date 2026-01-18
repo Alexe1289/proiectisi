@@ -45,7 +45,6 @@ private showMessage(text: string, isSuccess: boolean) {
     }, 3000);
   }
 
-  /* Backup data */
   backupData: any = null;
 
   toggleEdit() {

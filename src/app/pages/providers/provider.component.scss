@@ -3,14 +3,12 @@
   height: 100vh;
 }
 
-/* Layout: sidebar + map */
 .editor-layout {
   display: flex;
   flex-direction: row;
   height: 100%;
 }
 
-/* Sidebar on the left */
 .sidebar {
   width: 280px;
   padding: 1rem 1.5rem;
@@ -46,7 +44,6 @@
   }
 }
 
-/* Map area */
 .map-container {
   flex: 1;
   position: relative;

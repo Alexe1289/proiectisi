@@ -57,7 +57,6 @@ export class MyBookingsComponent implements OnInit {
       const token = localStorage.getItem('auth_token');
       const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-      // Folosim endpoint-ul de cancel pe care l-am discutat
       this.http.patch(`http://localhost:5001/api/reservations/${id}/cancel`, {}, { headers })
         .subscribe({
           next: () => {

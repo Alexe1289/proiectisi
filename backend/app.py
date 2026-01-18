@@ -221,10 +221,8 @@ def update_location(arcgis_feature_id):
 
     data = request.json or {}
 
-    # all columns
     columns = Location.__table__.columns.keys()
 
-    # columns not allowed to be modified
     forbidden_fields = {"location_id", "provider_id", "arcgis_feature_id"}
 
     for field in columns:
@@ -286,7 +284,6 @@ def get_available_locations():
     if role != "client":
         return jsonify({"msg": "Only clients can access locations!"}), 403
 
-    # query params
     capacity = request.args.get("capacity", type=int)
     location_type = request.args.get("location_type")
     dt = request.args.get("datetime")
@@ -295,23 +292,18 @@ def get_available_locations():
 
     query = Location.query
 
-    # filter by capacity
     if capacity is not None:
         query = query.filter(Location.capacity >= capacity)
 
-    # filter by type
     if location_type:
         query = query.filter(Location.location_type == location_type)
 
-    # availability filter
     if dt:
-        # filter on a specific day
         day = datetime.fromisoformat(dt)
         start_dt = day.replace(hour=0, minute=0, second=0, microsecond=0)
         end_dt = start_dt + timedelta(days=1)
 
     elif start_dt and end_dt:
-        # filter on a specific interval
         start_dt = datetime.fromisoformat(start_dt)
         end_dt = datetime.fromisoformat(end_dt)
 
@@ -414,8 +406,8 @@ def add_reservation(arcgis_feature_id):
     reservation = Reservation(
         client_id=user_id,
         location_id=loc.location_id,
-        start_datetime=datetime.fromisoformat(start_datetime),
-        end_datetime=datetime.fromisoformat(end_datetime),
+        start_datetime=datetime.fromisoformat(start_datetime.replace("Z", "+00:00")),
+        end_datetime=datetime.fromisoformat(end_datetime.replace("Z", "+00:00")),
         price_offer=data.get("price_offer"),
         guest_count=data.get("guest_count"),
         status='pending',
