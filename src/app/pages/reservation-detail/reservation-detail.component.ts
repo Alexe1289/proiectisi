@@ -205,39 +205,21 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
 
     makeOffer() {
         if (this.offerForm.valid) {
-            const token = localStorage.getItem('auth_token');
-            const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-            const formValue = this.offerForm.value;
-            
-            const body = {
-                start_datetime: formValue.dateRange.start.toISOString(),
-                end_datetime: formValue.dateRange.end.toISOString(),
-                price_offer: formValue.priceOffer,
-                guest_count: formValue.guestCount
-            };
+            console.log('Offer Sent:', {
+                propertyId: this.propertyId,
+                ...this.offerForm.value
+            });
 
-            this.http.post(
-                `http://localhost:5001/api/client/locations/${this.propertyId}/reservations`,
-                body,
-                { headers }
-                ).subscribe({
-                next: (res) => {
-                    console.log('Rezervare salvată cu succes:', res);
+            const dialogRef = this.dialog.open(this.successDialog, {
+                width: '400px',
+                panelClass: 'custom-success-dialog',
+                disableClose: true
+            });
 
-                    const dialogRef = this.dialog.open(this.successDialog, {
-                    width: '400px',
-                    disableClose: true
-                    });
+            dialogRef.afterClosed().subscribe(() => {
+                this.router.navigate(['/reservation']);
+            });
 
-                    dialogRef.afterClosed().subscribe(() => {
-                    this.router.navigate(['/reservation']);
-                    });
-                },
-                error: (err) => {
-                    console.error('Eroare la trimiterea rezervării:', err);
-                    alert('Eroare: ' + (err.error?.msg || 'Nu s-a putut salva rezervarea.'));
-                }
-                });
         } else {
             this.offerForm.markAllAsTouched();
         }
