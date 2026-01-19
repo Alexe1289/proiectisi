@@ -12,6 +12,7 @@ import Map from '@arcgis/core/Map.js';
 import MapView from '@arcgis/core/views/MapView.js';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer.js';
 import BasemapToggle from '@arcgis/core/widgets/BasemapToggle.js';
+import { SearchStateService } from 'src/app/services/search-state.service'; // <--- Import this
 import { start } from 'repl';
 
 @Component({
@@ -31,7 +32,7 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
     property: any = {
         name: 'Loading...',
         address: '',
-        pricePerDay: 450, // Default/Placeholder since backend might not have it yet
+        price: 450, // Default/Placeholder since backend might not have it yet
         capacity: 0,
         location_type: '',
         description: 'A stunning venue perfect for large events, conferences, and weddings. Located in the heart of the city.',
@@ -54,7 +55,8 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
-        private http: HttpClient // <--- Inject HttpClient
+        private http: HttpClient,
+        private searchStateService: SearchStateService
     ) {
         this.offerForm = this.fb.group({
             priceOffer: ['', Validators.required],
@@ -71,7 +73,7 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
         this.propertyId = this.route.snapshot.paramMap.get('id');
 
         // Set default price
-        this.offerForm.patchValue({ priceOffer: this.property.pricePerDay });
+        this.offerForm.patchValue({ priceOffer: this.property.price });
 
         // Fetch Real Data
         if (this.propertyId) {
@@ -82,7 +84,7 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
     // --- 1. Fetch Data from Backend ---
     // --- 1. Fetch Single Location from Backend ---
     fetchLocationDetails(id: string) {
-        const token = localStorage.getItem('auth_token');
+        const token = sessionStorage.getItem('auth_token');
         if (!token) return;
 
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
@@ -98,7 +100,11 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
                     this.property.location_type = location.location_type;
                     this.property.provider = location.provider;
                     this.property.description = location.description;
-
+                    this.property.price = location.price;
+                    this.property.provider.phone = location.provider.phone;
+                    this.property.provider.email = location.provider.email;
+                    this.property.provider.name = location.provider.name;
+                    this.offerForm.patchValue({ priceOffer: this.property.price });
                     // Now fetch the images for this specific location
                     this.loadLocationImages(id);
                 }
@@ -206,7 +212,7 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
 
     makeOffer() {
         if (this.offerForm.valid) {
-            const token = localStorage.getItem('auth_token');
+            const token = sessionStorage.getItem('auth_token');
             const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
             const formValue = this.offerForm.value;
 
@@ -242,7 +248,7 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
                         width: '400px',
                         disableClose: true
                     });
-
+                    this.searchStateService.clearState()
                     dialogRef.afterClosed().subscribe(() => {
                         this.router.navigate(['/reservation']);
                     });

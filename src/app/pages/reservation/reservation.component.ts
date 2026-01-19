@@ -80,7 +80,7 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
 	ngAfterViewInit() { }
 
 	search() {
-		const token = localStorage.getItem('auth_token');
+		const token = sessionStorage.getItem('auth_token');
 		if (!token) { console.error('JWT token missing'); return; }
 
 		const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });

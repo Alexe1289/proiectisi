@@ -21,9 +21,9 @@ export class ProfileComponent implements OnInit {
   success = false;
   private messageTimeout: any;
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
-ngOnInit(): void {
+  ngOnInit(): void {
     this.authService.getUser().subscribe({
       next: (user) => {
         if (user) {
@@ -34,9 +34,9 @@ ngOnInit(): void {
     });
   }
 
-private showMessage(text: string, isSuccess: boolean) {
+  private showMessage(text: string, isSuccess: boolean) {
     if (this.messageTimeout) clearTimeout(this.messageTimeout);
-    
+
     this.message = text;
     this.success = isSuccess;
 
@@ -57,13 +57,13 @@ private showMessage(text: string, isSuccess: boolean) {
   }
 
   saveChanges() {
-    const token = localStorage.getItem('auth_token');
-    
+    const token = sessionStorage.getItem('auth_token');
+
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.put("http://localhost:5001/api/user/me", this.userData, { headers } ).subscribe({
+    this.http.put("http://localhost:5001/api/user/me", this.userData, { headers }).subscribe({
       next: (res: any) => {
         this.showMessage('Profile updated successfully!', true);
         this.isEditMode = false;
@@ -85,39 +85,39 @@ private showMessage(text: string, isSuccess: boolean) {
   }
 
   showPasswordChange = false;
-    passwordData = {
+  passwordData = {
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
-    };
+  };
 
-    togglePasswordChange() {
+  togglePasswordChange() {
     this.showPasswordChange = !this.showPasswordChange;
     if (!this.showPasswordChange) {
-        this.passwordData = { currentPassword: '', newPassword: '', confirmPassword: '' };
+      this.passwordData = { currentPassword: '', newPassword: '', confirmPassword: '' };
     }
+  }
+
+  onChangePassword() {
+    if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+      this.showMessage("New passwords do not match!", false);
+      return;
     }
 
-    onChangePassword() {
-      if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
-          this.showMessage("New passwords do not match!", false);
-          return;
+    const token = sessionStorage.getItem('auth_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.put("http://localhost:5001/api/profile/change-password", this.passwordData, { headers }).subscribe({
+      next: () => {
+        this.showMessage("Password updated successfully!", true);
+        this.togglePasswordChange();
+      },
+      error: (err) => {
+        this.showMessage(err.error?.msg || "Failed to update password", false);
       }
-
-      const token = localStorage.getItem('auth_token');
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-      
-      this.http.put("http://localhost:5001/api/profile/change-password", this.passwordData, { headers } ).subscribe({
-          next: () => {
-            this.showMessage("Password updated successfully!", true);
-            this.togglePasswordChange();
-          },
-          error: (err) => {
-            this.showMessage(err.error?.msg || "Failed to update password", false);
-          }
-      });
-    }
+    });
+  }
 
 }

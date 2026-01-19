@@ -42,7 +42,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 	// private readonly token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NTc4NjI5MSwianRpIjoiMmQ5MGFjNzQtOTBkOS00NzIyLWE1ZjMtZDkyM2YzMGZjZDJjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjM6cHJvdmlkZXIiLCJuYmYiOjE3NjU3ODYyOTEsImNzcmYiOiIwNTdhODE1OC05Y2EwLTRjZjctOGZmZi01MGExMzMwN2Y3NDUifQ.7vBtFbhlv3dPE6ZA3Ze2GNRKBwZybZpSg8xI44bTUms";
 	private allowedLocationIds: number[] = [];
 	private isUpdatingParking = false;
-	private token = localStorage.getItem('auth_token');
+	private token = sessionStorage.getItem('auth_token');
 	selectedLocationName: string | null = null; // New property for UI
 	selectedLocationOID: number | null = null;
 	isSaving = false; // New property for loading spinner

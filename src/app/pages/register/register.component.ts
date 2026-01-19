@@ -19,7 +19,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  
+
   ngOnInit(): void {
   }
 
@@ -31,7 +31,7 @@ export class RegisterComponent implements OnInit {
       phone: this.phone,
       password: this.password
     };
-  
+
     this.http.post("http://localhost:5001/api/register", payload).
       subscribe({
         next: (res: any) => {

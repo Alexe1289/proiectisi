@@ -301,7 +301,8 @@ def get_available_locations():
             "capacity": loc.capacity,
             "description": loc.description,
             "address": loc.address,
-            "location_type": loc.location_type
+            "location_type": loc.location_type,
+            "price": loc.price,
         }
         for loc in locations
     ]
@@ -329,9 +330,11 @@ def get_location_details(arcgis_feature_id):
         "arcgis_feature_id": loc.arcgis_feature_id,
         "address": loc.address,
         "location_type": loc.location_type,
+        "price": loc.price,
         "provider": {
             "name": loc.provider.name,
-            "email": loc.provider.email
+            "email": loc.provider.email,
+            "phone": loc.provider.phone
         }
     }
 

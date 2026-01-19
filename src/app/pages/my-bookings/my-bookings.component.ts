@@ -29,14 +29,14 @@ export class MyBookingsComponent implements OnInit {
   bookings: IBooking[] = [];
   loading = true;
 
-  constructor(private http: HttpClient, private dialog: MatDialog) {}
+  constructor(private http: HttpClient, private dialog: MatDialog) { }
 
   ngOnInit() {
     this.fetchMyBookings();
   }
 
   fetchMyBookings() {
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
     this.http.get<IBooking[]>("http://localhost:5001/api/reservations", { headers })
@@ -54,7 +54,7 @@ export class MyBookingsComponent implements OnInit {
 
   cancelBooking(id: number) {
     if (confirm('Are you sure you want to cancel this booking?')) {
-      const token = localStorage.getItem('auth_token');
+      const token = sessionStorage.getItem('auth_token');
       const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
       this.http.patch(`http://localhost:5001/api/reservations/${id}/cancel`, {}, { headers })
@@ -71,9 +71,9 @@ export class MyBookingsComponent implements OnInit {
   editBooking(booking: IBooking) {
     const dialogRef = this.dialog.open(MyBookingsDetailsComponent, {
       width: '400px',
-      data: { 
-        price_offer: booking.price_offer, 
-        guest_count: booking.guest_count 
+      data: {
+        price_offer: booking.price_offer,
+        guest_count: booking.guest_count
       }
     });
 
@@ -85,7 +85,7 @@ export class MyBookingsComponent implements OnInit {
   }
 
   updateBooking(id: number, updatedFields: any) {
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
     this.http.put(`http://localhost:5001/api/reservations/${id}`, updatedFields, { headers })
@@ -102,17 +102,17 @@ export class MyBookingsComponent implements OnInit {
   }
 
   deleteBooking(id: number) {
-  if (confirm('Are you sure you want to PERMANENTLY delete this request? This action cannot be undone.')) {
-    const token = localStorage.getItem('auth_token');
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    if (confirm('Are you sure you want to PERMANENTLY delete this request? This action cannot be undone.')) {
+      const token = sessionStorage.getItem('auth_token');
+      const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-    this.http.delete(`http://localhost:5001/api/reservations/${id}/delete`, { headers })
-      .subscribe({
-        next: () => {
-          this.bookings = this.bookings.filter(b => b.reservation_id !== id);
-        },
-        error: (err) => alert('Error: ' + (err.error?.msg || 'Could not delete'))
-      });
+      this.http.delete(`http://localhost:5001/api/reservations/${id}/delete`, { headers })
+        .subscribe({
+          next: () => {
+            this.bookings = this.bookings.filter(b => b.reservation_id !== id);
+          },
+          error: (err) => alert('Error: ' + (err.error?.msg || 'Could not delete'))
+        });
+    }
   }
-}
 }

@@ -21,14 +21,14 @@ export class ManageOffersComponent implements OnInit {
   offers: IOffer[] = [];
   loading = true;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
     this.fetchOffers();
   }
 
   fetchOffers() {
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
     this.http.get<IOffer[]>("http://localhost:5001/api/reservations", { headers })
@@ -45,11 +45,11 @@ export class ManageOffersComponent implements OnInit {
   }
 
   updateOfferStatus(reservationId: number, newStatus: 'accepted' | 'rejected') {
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-    this.http.put(`http://localhost:5001/api/reservations/${reservationId}`, 
-      { status: newStatus }, 
+    this.http.put(`http://localhost:5001/api/reservations/${reservationId}`,
+      { status: newStatus },
       { headers }
     ).subscribe({
       next: () => {
