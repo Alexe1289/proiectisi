@@ -28,11 +28,10 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
     propertyId: string | null = null;
     mapView: MapView | null = null;
 
-    // Initial Placeholder Data (Will be overwritten by real data)
     property: any = {
         name: 'Loading...',
         address: '',
-        price: 450, // Default/Placeholder since backend might not have it yet
+        price: 450,
         capacity: 0,
         location_type: '',
         description: 'A stunning venue perfect for large events, conferences, and weddings. Located in the heart of the city.',
@@ -43,10 +42,9 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
             responseRate: '98%',
             joined: '2019'
         },
-        images: [] // Starts empty
+        images: []
     };
 
-    // UI State
     currentImageIndex = 0;
 
     constructor(
@@ -72,17 +70,13 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
     ngOnInit(): void {
         this.propertyId = this.route.snapshot.paramMap.get('id');
 
-        // Set default price
         this.offerForm.patchValue({ priceOffer: this.property.price });
 
-        // Fetch Real Data
         if (this.propertyId) {
             this.fetchLocationDetails(this.propertyId);
         }
     }
 
-    // --- 1. Fetch Data from Backend ---
-    // --- 1. Fetch Single Location from Backend ---
     fetchLocationDetails(id: string) {
         const token = sessionStorage.getItem('auth_token');
         if (!token) return;
@@ -105,15 +99,12 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
                     this.property.provider.email = location.provider.email;
                     this.property.provider.name = location.provider.name;
                     this.offerForm.patchValue({ priceOffer: this.property.price });
-                    // Now fetch the images for this specific location
                     this.loadLocationImages(id);
                 }
             },
             error: (err) => console.error('Error fetching location details', err)
         });
     }
-
-    // --- 2. Fetch Images from ArcGIS ---
     async loadLocationImages(id: string) {
         try {
             const listUrl = `${environment.arcgis.featureLayerUrl}/${id}/attachments?f=json&token=${environment.arcgis.token}`;
@@ -121,20 +112,16 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
             const json = await res.json();
 
             if (json.attachmentInfos && json.attachmentInfos.length > 0) {
-                // Map the results to full URLs
                 this.property.images = json.attachmentInfos.map((att: any) =>
                     `${environment.arcgis.featureLayerUrl}/${id}/attachments/${att.id}?token=${environment.arcgis.token}`
                 );
             } else {
-                // Fallback if no images found
                 this.property.images = [];
             }
         } catch (error) {
             console.error('Failed to load images from ArcGIS', error);
         }
     }
-
-    // --- Image Navigation ---
     nextImage() {
         if (this.property.images.length > 1) {
             this.currentImageIndex = (this.currentImageIndex + 1) % this.property.images.length;
@@ -147,7 +134,6 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
         }
     }
 
-    // --- Map Logic ---
     ngAfterViewInit(): void {
         if (this.propertyId) {
             this.initDetailMap(this.propertyId);
@@ -220,9 +206,6 @@ export class ReservationDetailComponent implements OnInit, AfterViewInit, OnDest
             const safeStart = new Date(formValue.dateRange.start);
             const safeEnd = new Date(formValue.dateRange.end);
 
-            // 2. Set hour to 13:00 (1 PM)
-            // This is the "safe middle" of the day. 
-            // Even if UTC subtracts 10 hours or adds 10 hours, it stays on the same day.
             safeStart.setHours(13, 0, 0, 0);
             safeEnd.setHours(14, 0, 0, 0);
             const body = {

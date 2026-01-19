@@ -1,7 +1,6 @@
 .reservation-page {
   padding: 24px;
   background: #f8f9fa;
-  /* Fundal modern, curat */
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
@@ -21,7 +20,6 @@
     }
   }
 
-  /* Bara de căutare modernizată - fără galben */
   .search-bar {
     display: flex;
     gap: 16px;
@@ -50,7 +48,6 @@
     }
   }
 
-  /* Grid Layout pentru rezultate (modificarea cerută anterior) */
   .results-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -59,7 +56,6 @@
     gap: 32px;
   }
 
-  /* Carduri verticale moderne */
   .booking-card {
     display: flex;
     flex-direction: column;
@@ -282,12 +278,10 @@
     }
   }
 
-  /* --- MAP CONTAINER (Original Styles Restored) --- */
   .map-container {
     width: 100%;
     height: 400px;
     position: relative;
-    /* Removed the border-radius/shadow from the previous suggestion to keep it original */
 
     &.fullscreen {
       position: fixed;
@@ -320,7 +314,6 @@
       }
     }
 
-    /* Side Panel restored exactly as it was */
     .side-panel {
       position: absolute;
       bottom: 24px;

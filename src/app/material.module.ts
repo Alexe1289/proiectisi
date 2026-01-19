@@ -19,4 +19,4 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatButtonModule
   ]
 })
-export class MaterialModule {}
+export class MaterialModule { }

@@ -30,7 +30,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 	@ViewChild('mapViewNode', { static: true }) mapViewEl!: ElementRef<HTMLDivElement>;
 
 	private view: MapView | null = null;
-	// AAPTxy8BH1VEsoebNVZXo8HurJWqcGsDXcgXORUKOHbx4SEyKajspwDLD_FV7kULXZy8YJalSsjCnjmJmmdMu_sovrAGh6NI6FVe1YzcpE8q9yLdbS7A8OwUYSqOGHxv4CA9lFsAB0P01OVZ0CsH9MNqZ-AEFs4cedGv8iHP93cLVe8J1mRIAhmzxNt6ZBLPsIAaffldLkParSywYEK8DqrMRH1f1fuLYkApbnPEKjhL55Y.AT1_Ji8b2dCj
 	private readonly apiKey =
 		'AAPTxy8BH1VEsoebNVZXo8HurJWqcGsDXcgXORUKOHbx4SEyKajspwDLD_FV7kULXZy8YJalSsjCnjmJmmdMu_sovrAGh6NI6FVe1YzcpE8q9yLdbS7A8OwUYSqOGHxv4CA9lFsAB0P01OVZ0CsH9MNqZ-AEFs4cedGv8iHP93cLVe8J1mRIAhmzxNt6ZBLPsIAaffldLkParSywYEK8DqrMRH1f1fuLYkApbnPEKjhL55Y.AT1_Ji8b2dCj';
 
@@ -39,13 +38,12 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 	private readonly parkingLayerUrl =
 		'https://services7.arcgis.com/MFmKAyIlHZMTXjGS/arcgis/rest/services/LocatiiEvenimente/FeatureServer/0';
-	// private readonly token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NTc4NjI5MSwianRpIjoiMmQ5MGFjNzQtOTBkOS00NzIyLWE1ZjMtZDkyM2YzMGZjZDJjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjM6cHJvdmlkZXIiLCJuYmYiOjE3NjU3ODYyOTEsImNzcmYiOiIwNTdhODE1OC05Y2EwLTRjZjctOGZmZi01MGExMzMwN2Y3NDUifQ.7vBtFbhlv3dPE6ZA3Ze2GNRKBwZybZpSg8xI44bTUms";
 	private allowedLocationIds: number[] = [];
 	private isUpdatingParking = false;
 	private token = sessionStorage.getItem('auth_token');
-	selectedLocationName: string | null = null; // New property for UI
+	selectedLocationName: string | null = null;
 	selectedLocationOID: number | null = null;
-	isSaving = false; // New property for loading spinner
+	isSaving = false;
 
 
 	constructor(private http: HttpClient,
@@ -54,11 +52,10 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 	async deleteCascade(layer: FeatureLayer, parentId: number, layerName: string) {
 		try {
-			// 1. Find all features belonging to this parent ID
 			const result = await layer.queryFeatures({
 				where: `location_id = ${parentId}`,
 				returnGeometry: false,
-				outFields: ["OBJECTID"] // We only need the ID to delete
+				outFields: ["OBJECTID"]
 			});
 
 			if (result.features.length > 0) {
@@ -103,8 +100,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 			Authorization: `Bearer ${this.token}`
 		});
 
-		// Assuming your backend accepts DELETE requests at /api/provider/locations/:id
-		// If your backend expects the ID in the body, let me know and I can adjust this.
 		await this.http.delete(
 			`http://localhost:5001/api/provider/locations/${arcgis_feature_id}`,
 			{ headers }
@@ -126,7 +121,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 			"Content-Type": "application/json"
 		});
 
-		// We assume your backend accepts PUT requests at /api/provider/locations/:id
 		await this.http.put(
 			`http://localhost:5001/api/provider/locations/${payload.arcgis_feature_id}`,
 			payload,
@@ -162,10 +156,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 	async ngAfterViewInit(): Promise<void> {
 		try {
-			// Configure global ArcGIS settings
 			esriConfig.apiKey = this.apiKey;
-			//         await IdentityManager.checkSignInStatus("https://www.arcgis.com/sharing")
-			//   .catch(() => IdentityManager.getCredential("https://www.arcgis.com/sharing"));
 
 			const locationsLayer = new FeatureLayer({
 				url: this.featureLayerUrl,
@@ -178,9 +169,9 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 			parkingLayer.featureEffect = {
 				filter: new FeatureFilter({
-					where: "1 = 0"   // matches nothing → all hidden
+					where: "1 = 0"
 				}),
-				excludedEffect: "opacity(0%)"  // hide excluded features
+				excludedEffect: "opacity(0%)"
 			} as any;
 
 
@@ -201,14 +192,14 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 			await this.view.when();
 			await locationsLayer.when();
 			this.view.goTo({
-				center: [26.1025, 44.4268], // Bucharest
+				center: [26.1025, 44.4268],
 				zoom: 13
 			});
 
 			this.allowedLocationIds = await this.fetchAllowedLocationIds();
 
 			if (this.allowedLocationIds.length === 0) {
-				locationsLayer.definitionExpression = "1 = 0"; // hide all
+				locationsLayer.definitionExpression = "1 = 0";
 			} else {
 				locationsLayer.definitionExpression =
 					`OBJECTID IN (${this.allowedLocationIds.join(",")})`;
@@ -306,18 +297,14 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 					for (const deleted of event.deletedFeatures) {
 						const objectId = deleted.objectId;
 						console.log("ArcGIS feature deleted:", objectId);
-
-						// 1. Remove from local allowed list so the map filter stays accurate
 						this.allowedLocationIds = this.allowedLocationIds.filter(id => id !== objectId);
 
-						// 2. Update definition expression immediately
 						if (this.allowedLocationIds.length === 0) {
 							locationsLayer.definitionExpression = "1 = 0";
 						} else {
 							locationsLayer.definitionExpression = `OBJECTID IN (${this.allowedLocationIds.join(",")})`;
 						}
 
-						// 3. Notify Backend
 
 						await this.deleteLocationFromBackend(objectId);
 						await this.deleteCascade(parkingLayer, objectId, "parking locations");
@@ -328,7 +315,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						const objectId = updated.objectId;
 						console.log("ArcGIS feature updated:", objectId);
 
-						// Query the layer again to ensure we get the latest edited values
 						const result = await locationsLayer.queryFeatures({
 							objectIds: [objectId],
 							outFields: ["*"],
@@ -339,7 +325,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 							const feature = result.features[0];
 							const attrs = feature.attributes;
 
-							// Send the new data to the backend
 							await this.updateLocationInBackend({
 								name: attrs.name,
 								capacity: attrs.capacity,
@@ -358,10 +343,8 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 			reactiveUtils.watch(
 				() => editor.activeWorkflow,
 				(workflow) => {
-					// Case A: User selected a feature (Entered "Update" mode)
 					if (workflow && workflow.type === "update") {
 						console.log("Editor workflow started for update:", workflow);
-						// The 'editableItem' contains the feature being edited
 						const editableItem = (workflow as any).editableItem;
 						const feature = editableItem?.feature;
 
@@ -371,7 +354,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 							this.selectedLocationName = feature.attributes.name || "Unnamed Location";
 						}
 					}
-					// Case B: User cleared selection or finished editing
 				}
 			);
 			this.view.on("click", async (event) => {
@@ -398,13 +380,13 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						where: `location_id = ${this.selectedLocationOID}`
 					}),
 					includedEffect: "opacity(100%)",
-					excludedEffect: "opacity(0%)"  // hide excluded features
+					excludedEffect: "opacity(0%)"
 				} as any;
 			});
 
 			const toggle = new BasemapToggle({
 				view: this.view,
-				nextBasemap: "arcgis-imagery" // Allows switching to Satellite view
+				nextBasemap: "arcgis-imagery"
 			});
 
 			this.view.ui.add(toggle, "bottom-right");
@@ -434,7 +416,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						where: `location_id = ${this.selectedLocationOID}`
 					}),
 					includedEffect: "opacity(100%)",
-					excludedEffect: "opacity(0%)"  // hide excluded features
+					excludedEffect: "opacity(0%)"
 				} as any;
 				this.isUpdatingParking = false;
 
@@ -442,7 +424,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 
 
 		} catch (err) {
-			// eslint-disable-next-line no-console
 			console.error('Error loading map/editor', err);
 		}
 	}

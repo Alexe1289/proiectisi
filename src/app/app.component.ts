@@ -63,7 +63,7 @@ export class AppComponent implements OnInit {
   currentUser: any = null;
 
   constructor(public router: Router, private authService: AuthService, private arcgisAuthService: ArcgisAuthService) {
-      this.authService.getUser().subscribe(user => {
+    this.authService.getUser().subscribe(user => {
       this.currentUser = user;
       this.role = user ? user.role : 'guest';
     });
@@ -80,7 +80,6 @@ export class AppComponent implements OnInit {
     await this.arcgisAuthService.getValidToken();
   }
 
-  // See app.component.html
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
   }

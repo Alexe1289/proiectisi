@@ -42,10 +42,10 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
 
 	locationTypes: string[] = [
 		'Conference Hall',
-		'Wedding Venue',
-		'Meeting Room',
-		'Banquet Hall',
-		'Outdoor Space',
+		'Arena',
+		'Theater',
+		'Club',
+		'Outdoors',
 		'Studio'
 	];
 
@@ -85,21 +85,15 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
 
 		const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-		// 1. Prepare Query Parameters
 		const formVal = this.reservationForm.value;
 		let params = new HttpParams();
 
-		// Capacity
 		if (formVal.capacity) {
 			params = params.set('capacity', formVal.capacity);
 		}
-
-		// Location Type (Dropdown)
 		if (formVal.locationType) {
 			params = params.set('location_type', formVal.locationType);
 		}
-
-		// Date Range
 		const start = formVal.dateRange?.start;
 		const end = formVal.dateRange?.end;
 
@@ -107,25 +101,18 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
 			const safeStart = new Date(start);
 			const safeEnd = new Date(end);
 
-			// 2. Set hour to 13:00 (1 PM)
-			// This is the "safe middle" of the day. 
-			// Even if UTC subtracts 10 hours or adds 10 hours, it stays on the same day.
+
 			safeStart.setHours(13, 0, 0, 0);
 			safeEnd.setHours(14, 0, 0, 0);
-			// Convert Date objects to ISO strings for the backend
 			params = params.set('start_datetime', safeStart.toISOString());
 			params = params.set('end_datetime', safeEnd.toISOString());
 		}
 
-		// 2. Make Request to the NEW Endpoint
 		this.http.get<any[]>("http://localhost:5001/api/client/locations/available", { headers, params }).subscribe({
 			next: async (res) => {
-				// 3. Filter client-side ONLY for text search (name/address)
-				// The backend handles capacity, type, and dates now.
 				const query = (formVal.locationQuery || '').toLowerCase();
 
 				const filtered = res.filter(loc => {
-					// If query is empty, keep everything. Otherwise check name/address.
 					console.log("loc.address:", loc.address);
 					console.log("loc.name:", loc.name);
 					console.log("query:", query);
@@ -136,7 +123,6 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
 						(loc.address?.toLowerCase().includes(query) ?? false);
 				});
 
-				// 4. Map results to view model
 				this.searchResults = filtered.map(loc => ({
 					...loc,
 					imageUrls: [],
@@ -178,7 +164,6 @@ export class ReservationComponent implements AfterViewInit, OnDestroy {
 		}
 	}
 
-	// ... (Rest of the component methods remain exactly the same: nextImage, toggleMap, initMap, etc.)
 
 	nextImage(e: Event, loc: LocationResult) {
 		e.stopPropagation();

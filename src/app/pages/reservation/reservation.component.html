@@ -29,8 +29,8 @@
 
     <mat-form-field appearance="outline" class="no-bottom-padding" style="flex: 1.5;">
       <mat-date-range-input [formGroup]="reservationForm.get('dateRange')" [rangePicker]="picker">
-        <input matStartDate placeholder="Check-in" formControlName="start">
-        <input matEndDate placeholder="Check-out" formControlName="end">
+        <input matStartDate placeholder="Start Date" formControlName="start">
+        <input matEndDate placeholder="End Date" formControlName="end">
       </mat-date-range-input>
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-date-range-picker #picker></mat-date-range-picker>
