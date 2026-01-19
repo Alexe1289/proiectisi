@@ -1,49 +1,64 @@
 <div class="reservation-page">
   <div class="header-section">
-    <h2>Book your next event</h2>
-    <button mat-stroked-button color="accent" (click)="toggleMap()" *ngIf="!showMap && searchResults.length > 0">
-      <mat-icon>map</mat-icon> Show on Map
+    <h2>Explore Venues</h2>
+    <button mat-flat-button color="accent" (click)="toggleMap()" *ngIf="!showMap && searchResults.length > 0">
+      <mat-icon>map</mat-icon> Map View
     </button>
   </div>
 
-  <div class="search-bar">
-    <mat-form-field appearance="outline" class="location-field">
+  <div class="search-bar" [formGroup]="reservationForm">
+
+    <mat-form-field appearance="outline" class="no-bottom-padding" style="flex: 2;">
       <mat-icon matPrefix>search</mat-icon>
-      <input matInput placeholder="Location for event" formControlName="locationQuery">
+      <input matInput placeholder="Where to?" formControlName="locationQuery">
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Date range</mat-label>
+    <mat-form-field appearance="outline" class="no-bottom-padding" style="flex: 1; min-width: 140px;">
+      <mat-label>Type</mat-label>
+      <mat-select formControlName="locationType">
+        <mat-option [value]="null">Any Type</mat-option>
+        <mat-option *ngFor="let type of locationTypes" [value]="type">{{ type }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="no-bottom-padding" style="flex: 0 0 110px;">
+      <mat-label>Capacity</mat-label>
+      <input matInput type="number" formControlName="capacity" min="1">
+      <span matSuffix style="font-size: 11px; color: #888;">ppl &nbsp;</span>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="no-bottom-padding" style="flex: 1.5;">
       <mat-date-range-input [formGroup]="reservationForm.get('dateRange')" [rangePicker]="picker">
-        <input matStartDate placeholder="Check-in">
-        <input matEndDate placeholder="Check-out">
+        <input matStartDate placeholder="Check-in" formControlName="start">
+        <input matEndDate placeholder="Check-out" formControlName="end">
       </mat-date-range-input>
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-date-range-picker #picker></mat-date-range-picker>
     </mat-form-field>
 
-    <button mat-raised-button color="primary" class="search-btn" (click)="search()">Search</button>
+    <button mat-flat-button color="primary" class="search-btn" (click)="search()">Search</button>
   </div>
 
   <div *ngIf="searchResults.length && !showMap" class="results-container">
-
     <div class="booking-card" *ngFor="let loc of searchResults">
       <div class="card-image-wrapper">
         <div class="image-carousel" *ngIf="loc.imageUrls && loc.imageUrls.length > 0; else noImage">
-          <img [src]="loc.imageUrls[loc.currentImageIndex!]" alt="Location Preview">
+          <img [src]="loc.imageUrls[loc.currentImageIndex!]" alt="Location">
 
-          <button class="nav-btn prev" *ngIf="loc.imageUrls.length > 1" (click)="prevImage($event, loc)">‹</button>
-          <button class="nav-btn next" *ngIf="loc.imageUrls.length > 1" (click)="nextImage($event, loc)">›</button>
+          <button class="nav-btn prev" *ngIf="loc.imageUrls.length > 1" (click)="prevImage($event, loc)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button class="nav-btn next" *ngIf="loc.imageUrls.length > 1" (click)="nextImage($event, loc)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
 
           <div class="dots" *ngIf="loc.imageUrls.length > 1">
             <span *ngFor="let img of loc.imageUrls; let i = index" [class.active]="i === loc.currentImageIndex"></span>
           </div>
         </div>
-
         <ng-template #noImage>
           <div class="placeholder-image">
             <mat-icon>image_not_supported</mat-icon>
-            <span>No photos</span>
           </div>
         </ng-template>
       </div>
@@ -55,29 +70,28 @@
         </div>
 
         <div class="location-row">
-          <a class="link-address">{{ loc.address }}</a>
+          <mat-icon inline style="font-size:16px; margin-right:4px;">location_on</mat-icon>
+          <span>{{ loc.address }}</span>
         </div>
 
         <div class="tags-row">
-          <span class="tag">Capacity: {{ loc.capacity }} ppl</span>
+          <span class="tag">Up to {{ loc.capacity }} Guests</span>
         </div>
 
         <div class="description-preview">
-          <p>Perfect for large events, conferences, and weddings. Located in the heart of the city.</p>
+          {{ loc.description || 'A beautiful venue perfect for your next event. Features modern amenities and great
+          location.' }}
         </div>
       </div>
 
       <div class="card-pricing">
-
         <div class="price-box">
-          <span class="price-label">Starting from</span>
-          <span class="price-value">€ 450</span>
-          <span class="price-detail">per day</span>
-
-          <button mat-raised-button color="primary" [routerLink]="['/reservation', loc.arcgis_feature_id]">
-            Reserve <mat-icon iconPositionEnd>chevron_right</mat-icon>
-          </button>
+          <span class="price-label">Daily Rate</span>
+          <span class="price-value">€ {{ loc.price }}</span>
         </div>
+        <button mat-flat-button color="primary" [routerLink]="['/reservation', loc.arcgis_feature_id]">
+          Reserve
+        </button>
       </div>
     </div>
   </div>
@@ -90,49 +104,25 @@
     <div class="backdrop" *ngIf="selectedLocation" (click)="closePanel()"></div>
 
     <div class="side-panel" *ngIf="selectedLocation">
-
       <div class="panel-image-wrapper">
         <div class="image-carousel" *ngIf="selectedLocationImages.length > 0; else noMapImage">
           <img [src]="selectedLocationImages[selectedImageIndex]" alt="Location Preview">
-
           <button class="nav-btn prev" *ngIf="selectedLocationImages.length > 1" (click)="prevMapImage()">‹</button>
           <button class="nav-btn next" *ngIf="selectedLocationImages.length > 1" (click)="nextMapImage()">›</button>
-
-          <div class="dots" *ngIf="selectedLocationImages.length > 1">
-            <span *ngFor="let img of selectedLocationImages; let i = index"
-              [class.active]="i === selectedImageIndex"></span>
-          </div>
         </div>
-
         <ng-template #noMapImage>
-          <div class="placeholder-image">
-            <mat-icon>image_not_supported</mat-icon>
-            <span>No photos</span>
-          </div>
+          <div class="placeholder-image"><mat-icon>image</mat-icon></div>
         </ng-template>
-
         <button class="close-icon-btn" (click)="closePanel()">✕</button>
       </div>
 
       <div class="panel-content">
         <h2>{{ selectedLocation.name }}</h2>
-
-        <div class="info-row">
-          <mat-icon>location_on</mat-icon>
-          <span>{{ selectedLocation.address }}</span>
-        </div>
-
-        <div class="tags">
-          <span class="badge">{{ selectedLocation.location_type }}</span>
-          <span class="badge outline">Capacity: {{ selectedLocation.capacity }}</span>
-        </div>
-
+        <div class="info-row"><mat-icon>location_on</mat-icon> {{ selectedLocation.address }}</div>
         <div class="price-section">
-          <div class="price">
-            <span class="currency">€</span>450 <span class="period">/ day</span>
-          </div>
-          <button mat-raised-button color="primary" [routerLink]="['/reservation', selectedLocation.arcgis_feature_id]">
-            Reserve Now
+          <div class="price">€{{ selectedLocation.price }} <span class="period">/ day</span></div>
+          <button mat-flat-button color="primary" [routerLink]="['/reservation', selectedLocation.arcgis_feature_id]">
+            Details
           </button>
         </div>
       </div>

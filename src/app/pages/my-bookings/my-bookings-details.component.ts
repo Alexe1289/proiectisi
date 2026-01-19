@@ -9,8 +9,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     <mat-dialog-content [formGroup]="form">
       <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 10px;">
         <mat-form-field appearance="outline">
-          <mat-label>Price Offer (RON)</mat-label>
+          <mat-label>Price Offer </mat-label>
           <input matInput type="number" formControlName="price_offer">
+          <span class="currency">€</span>
         </mat-form-field>
 
         <mat-form-field appearance="outline">

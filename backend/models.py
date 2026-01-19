@@ -31,6 +31,7 @@ class Location(db.Model):
     arcgis_feature_id = db.Column(db.String(255), nullable=True)
     address = db.Column(db.String(255), nullable=False)
     location_type = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
 
     provider_id = db.Column(db.Integer, db.ForeignKey('providers.provider_id'), nullable=False)
 

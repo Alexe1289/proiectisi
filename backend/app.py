@@ -7,6 +7,13 @@ from models import *
 from datetime import datetime
 from datetime import timedelta
 
+from datetime import datetime, timezone
+
+def parse_utc_to_naive(value: str) -> datetime:
+    dt = datetime.fromisoformat(value.replace("Z", "00:00"))
+    return dt.astimezone(timezone.utc).replace(tzinfo=None)
+
+
 app = Flask(__name__)
 CORS(
     app,
@@ -176,6 +183,7 @@ def add_location():
     arcgis_feature_id = data.get("arcgis_feature_id")
     address = data.get("address")
     location_type = data.get("location_type")
+    price = data.get("price")
 
     if not name or not capacity or not address or not location_type or not arcgis_feature_id:
         return jsonify({"msg": "Missing required fields!"}), 400
@@ -195,7 +203,8 @@ def add_location():
         arcgis_feature_id=arcgis_feature_id,
         address=address,
         location_type=location_type,
-        provider_id=user_id
+        provider_id=user_id,
+        price=price
     )
 
     db.session.add(loc)
@@ -235,47 +244,6 @@ def update_location(arcgis_feature_id):
 
     return jsonify({"msg": "Location updated"})
 
-@app.route("/api/provider/locations/<string:arcgis_feature_id>", methods=["DELETE"])
-@jwt_required()
-def delete_location(arcgis_feature_id):
-    user_id, role = get_user()
-
-    if role != "provider":
-        return jsonify({"msg": "Only providers can delete locations!"}), 403
-
-    loc = Location.query.filter_by(arcgis_feature_id=arcgis_feature_id).first()
-
-    if not loc:
-        return jsonify({"msg": "Location not found!"}), 404
-
-    if loc.provider_id != user_id:
-        return jsonify({"msg": "You can delete only your own locations!"}), 403
-
-    db.session.delete(loc)
-    db.session.commit()
-
-    return jsonify({"msg": "Location deleted successfully"})
-
-@app.route("/api/client/locations", methods=["GET"])
-@jwt_required()
-def get_locations_for_clients():
-    user_id, role = get_user()
-
-    if role != "client":
-        return jsonify({"msg": "Only clients can access all locations!"}), 403
-
-    locs = Location.query.all()
-
-    result = [
-        {
-            "arcgis_feature_id": loc.arcgis_feature_id,
-            "name": loc.name
-        }
-        for loc in locs
-    ]
-
-    return jsonify(result)
-
 @app.route("/api/client/locations/available", methods=["GET"])
 @jwt_required()
 def get_available_locations():
@@ -304,8 +272,9 @@ def get_available_locations():
         end_dt = start_dt + timedelta(days=1)
 
     elif start_dt and end_dt:
-        start_dt = datetime.fromisoformat(start_dt)
-        end_dt = datetime.fromisoformat(end_dt)
+        
+        start_dt = datetime.fromisoformat(start_dt.replace("Z", "+00:00"))
+        end_dt = datetime.fromisoformat(end_dt.replace("Z", "+00:00"))
 
     else:
         start_dt = end_dt = None
@@ -329,6 +298,10 @@ def get_available_locations():
         {
             "arcgis_feature_id": loc.arcgis_feature_id,
             "name": loc.name,
+            "capacity": loc.capacity,
+            "description": loc.description,
+            "address": loc.address,
+            "location_type": loc.location_type
         }
         for loc in locations
     ]

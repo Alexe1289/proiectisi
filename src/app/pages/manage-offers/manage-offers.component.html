@@ -12,7 +12,7 @@
 
     <mat-card *ngFor="let offer of offers" class="offer-card">
       <div class="status-indicator" [ngClass]="offer.status"></div>
-      
+
       <div class="card-header-spacer">
         <mat-card-header>
           <mat-card-title>{{ offer.location.name }}</mat-card-title>
@@ -24,10 +24,11 @@
           <mat-icon>person</mat-icon>
           <span><strong>Client:</strong> {{ offer.client.name }}</span>
         </div>
-        
+
         <div class="detail-row">
           <mat-icon>payments</mat-icon>
-          <span><strong>Offer:</strong> {{ offer.price_offer }} RON</span>
+          <span><strong>Offer:</strong> {{ offer.price_offer }} <span class="currency">€</span></span>
+
         </div>
 
         <div class="detail-row">

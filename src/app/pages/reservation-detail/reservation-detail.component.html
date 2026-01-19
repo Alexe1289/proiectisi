@@ -63,7 +63,7 @@
 
                 <div class="amenities-grid">
                     <div class="amenity"><mat-icon>people</mat-icon> Up to {{property.capacity}} Guests</div>
-                    <div class="amenity"><mat-icon>people</mat-icon> Up to 300 Guests</div>
+                    <div class="amenity"><mat-icon>local_hotel</mat-icon> {{property.location_type}}</div>
 
                 </div>
             </div>
@@ -78,7 +78,6 @@
                         <p><strong>Phone:</strong> {{ property.provider.phone }}</p>
                         <p><strong>Email:</strong> {{ property.provider.email }}</p>
                     </div>
-                    <button mat-stroked-button>Contact Host</button>
                 </div>
             </div>
         </div>
@@ -142,7 +141,6 @@
                         Send Offer
                     </button>
 
-                    <p class="disclaimer">You won't be charged yet</p>
                 </form>
             </div>
         </div>

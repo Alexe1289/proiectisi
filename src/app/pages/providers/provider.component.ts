@@ -118,6 +118,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 		description?: string | null;
 		address: string;
 		location_type: string;
+		price: number;
 		arcgis_feature_id: number;
 	}) {
 		const headers = new HttpHeaders({
@@ -141,6 +142,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 		description?: string | null;
 		address: string;
 		location_type: string;
+		price: number;
 		arcgis_feature_id: number;
 	}) {
 		const headers = new HttpHeaders({
@@ -234,7 +236,9 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 										{ type: "field", fieldName: "address" },
 										{ type: "field", fieldName: "parking" },
 										{ type: "field", fieldName: "capacity" },
-										{ type: "field", fieldName: "location_type" }
+										{ type: "field", fieldName: "location_type" },
+										{ type: "field", fieldName: "price" },
+										{ type: "field", fieldName: "description" }
 									]
 								}
 							]
@@ -252,7 +256,6 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 									label: "Logistic Info",
 									elements: [
 										{ type: "field", fieldName: "capacity" },
-										{ type: "field", fieldName: "parking" }
 									]
 								}
 							]
@@ -291,6 +294,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 						description: attrs.description ?? null,
 						address: attrs.address,
 						location_type: attrs.location_type,
+						price: attrs.price,
 						arcgis_feature_id: objectId
 					});
 					this.selectedLocationName = attrs.name || "Unnamed Location";
@@ -342,6 +346,7 @@ export class ProviderComponent implements AfterViewInit, OnDestroy {
 								description: attrs.description ?? null,
 								address: attrs.address,
 								location_type: attrs.location_type,
+								price: attrs.price,
 								arcgis_feature_id: objectId
 							});
 						}

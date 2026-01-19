@@ -12,11 +12,11 @@
 
     <mat-card *ngFor="let booking of bookings" class="offer-card">
       <div class="status-indicator" [ngClass]="booking.status"></div>
-      
+
       <div class="card-header-spacer">
         <mat-card-header>
-            <mat-card-title>{{ booking.location.name }}</mat-card-title>
-            
+          <mat-card-title>{{ booking.location.name }}</mat-card-title>
+
         </mat-card-header>
       </div>
 
@@ -28,7 +28,9 @@
 
         <div class="detail-row">
           <mat-icon>payments</mat-icon>
-          <span><strong>My Offer:</strong> {{ booking.price_offer }} RON</span>
+          <span>
+            <strong>My Offer:</strong> {{ booking.price_offer }}<span class="currency">€</span>
+          </span>
         </div>
 
         <div class="detail-row">
@@ -47,30 +49,27 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-stroked-button color="primary" 
-                *ngIf="booking.status === 'pending'"
-                (click)="editBooking(booking)">
-        <mat-icon>edit</mat-icon> EDIT
+        <button mat-stroked-button color="primary" *ngIf="booking.status === 'pending'" (click)="editBooking(booking)">
+          <mat-icon>edit</mat-icon> EDIT
         </button>
 
-        <button mat-stroked-button color="warn" 
-                *ngIf="booking.status === 'pending' || booking.status === 'accepted'"
-                (click)="deleteBooking(booking.reservation_id)">
-        <mat-icon>cancel</mat-icon> CANCEL
+        <button mat-stroked-button color="warn" *ngIf="booking.status === 'pending' || booking.status === 'accepted'"
+          (click)="deleteBooking(booking.reservation_id)">
+          <mat-icon>cancel</mat-icon> CANCEL
         </button>
 
-        <button mat-stroked-button color="warn" 
-                *ngIf="booking.status === 'rejected'"
-                (click)="deleteBooking(booking.reservation_id)">
-        <mat-icon>delete</mat-icon> DELETE
+        <button mat-stroked-button color="warn" *ngIf="booking.status === 'rejected'"
+          (click)="deleteBooking(booking.reservation_id)">
+          <mat-icon>delete</mat-icon> DELETE
         </button>
 
       </mat-card-actions>
 
-      <div class="final-status" *ngIf="booking.status !== 'pending' && booking.status !== 'accepted'" [ngClass]="booking.status">
+      <div class="final-status" *ngIf="booking.status !== 'pending' && booking.status !== 'accepted'"
+        [ngClass]="booking.status">
         {{ booking.status | uppercase }}
       </div>
-      
+
       <div class="final-status accepted" *ngIf="booking.status === 'accepted'">
         <mat-icon>check_circle</mat-icon> CONFIRMED
       </div>
